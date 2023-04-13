@@ -31,7 +31,7 @@ Type: {data.get("employement_type")}
 Level: {data.get("level")}
 
 
-{data.get("body", "")[:500]}......
+{data.get("body", "")}
         """
         result = await super().create(db_session, data)
         if result.id:

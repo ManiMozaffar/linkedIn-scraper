@@ -40,7 +40,8 @@ def get_url(page_number=0, location=None):
         "trk": "public_jobs_jobs-search-bar_search-submit",
         "position": 1,
         "pageNum": page_number,
-        "f_TPR": "r86400"
+        "f_TPR": "r86400",
+        "f_T": "9%2C25169%2C3549%2C100%2C25194"
     }
     query_params = urlencode(params)
     return f"{url}?{query_params}"
@@ -53,12 +54,16 @@ def generate_device_specs():
     return (random_ram, random_hw_concurrency)
 
 
-async def get_element_text(page: Page, xpath: str, replace=True):
-    result: str = await page.locator(xpath).text_content()
+async def get_element_text(page: Page, xpath: str, replace=True, timeout=None):
+    result: str = await page.locator(xpath).text_content(timeout=timeout)
     if replace:
         return result.strip().replace("\n", "")
     else:
         return result
+
+
+async def fill_form(page: Page, xpath: str, text: str):
+    return await page.locator(xpath).fill(text)
 
 
 def exception_handler(func):
@@ -74,5 +79,10 @@ def exception_handler(func):
 
 
 @exception_handler
-async def safe_get_element_text(page: Page, xpath: str, replace=True):
-    return await get_element_text(page, xpath, replace)
+async def safe_get_element_text(page: Page, xpath: str, replace=True, timeout=None):
+    return await get_element_text(page, xpath, replace, timeout=timeout)
+
+
+@exception_handler
+async def safe_fill_form(page: Page, xpath: str, text: str):
+    return await fill_form(page, xpath, text)

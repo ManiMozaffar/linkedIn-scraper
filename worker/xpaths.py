@@ -9,3 +9,7 @@ BODY_INFO = '//div[contains(@class, "show-more-less-html__markup")]'
 COMPANY_NAME = '//a[contains(@class, "name-link")]'
 LOCATION = '//span[@class="topcard__flavor topcard__flavor--bullet"]'
 TITLE = '//a[@class="topcard__link"]//h2'
+
+
+GPT_FILL = '//textarea[@class="n-input__textarea-el"]'
+GPT_BUTTON = '//footer//button[@type]'
