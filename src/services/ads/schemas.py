@@ -6,6 +6,7 @@ import datetime
 class AdsOut(BaseModel):
     id: int
     ads_id: str
+    country: str
     location: str
     title: str
     body: str
@@ -20,6 +21,7 @@ class AdsOut(BaseModel):
 
 class AdsUpdate(BaseModel):
     ads_id: str
+    country: str
     location: str
     body: str
     company_name: str

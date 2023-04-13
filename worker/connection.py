@@ -5,11 +5,12 @@ host = "http://127.0.0.1:8000"
 
 def create_ads(
         ads_id, location, body, company_name, title, source, employement_type,
-        level
+        level, country
 ):
     data = {
         "ads_id": ads_id,
         "location": location,
+        "country": country,
         "body": body,
         "company_name": company_name,
         "title": title,
