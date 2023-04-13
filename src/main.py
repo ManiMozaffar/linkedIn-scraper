@@ -2,21 +2,20 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
+import logging
+import uvicorn
 
 from core.handlers import http_error_handler, http422_error_handler
 from core.config import get_app_settings
 from core.events import create_start_app_handler, create_stop_app_handler
 from core.routes import router
-# from celery import Celery
-import traceback
-import uvicorn
+
 
 settings = get_app_settings()
+settings.configure_logging()
 
 
 def get_application() -> FastAPI:
-    settings.configure_logging()
-
     application = FastAPI(**settings.fastapi_kwargs)
 
     application.add_middleware(
@@ -43,18 +42,22 @@ def get_application() -> FastAPI:
     return application
 
 
-# celery_app = Celery(
-#     'tasks',
-#     broker=settings.redis_url,
-#     backend=settings.redis_url,
-# )
-
 app = get_application()
 
 
-if __name__ == "__main__":
+def run_application():
     try:
-        uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, workers=1)
+        uvicorn.run(
+            "main:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=True,
+            workers=1,
+        )
     except Exception as e:
-        print("An error occurred:", e)
-        traceback.print_exc()
+        logging.error("An error occurred while running the application")
+        logging.exception(e)
+
+
+if __name__ == "__main__":
+    run_application()
