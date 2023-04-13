@@ -10,6 +10,8 @@ import connection
 async def scrape_linkedin(proxy=None, *args, **kwargs):
     while True:
         async with async_playwright() as p:
+            country = helpers.get_country()
+            print(country)
             browser = await p.firefox.launch(
                 headless=True,
                 args=['--start-maximized'],
@@ -74,7 +76,7 @@ async def scrape_linkedin(proxy=None, *args, **kwargs):
                 })();
             ''' % helpers.generate_device_specs()
             await page.add_init_script(hardware_spoof_script)
-            await page.goto(helpers.get_url())
+            await page.goto(helpers.get_url(location=country))
             total_num = int(await page.locator(xpaths.JOB_TOTAL_NUM).text_content())
             total_num = 100 if total_num > 100 else total_num
             for index in range(1, total_num+1):
@@ -104,8 +106,8 @@ async def scrape_linkedin(proxy=None, *args, **kwargs):
                         page, xpaths.BODY_INFO, False
                     )
                     connection.create_ads(
-                        ads_id, location, info, company_name,
-                        title, 1, employement_type, level
+                        ads_id, location, info.strip(), company_name,
+                        title, 1, employement_type, level, country
                     )
                     print(f"Finished {ads_id}")
                     await asyncio.sleep(random.randint(3, 12))

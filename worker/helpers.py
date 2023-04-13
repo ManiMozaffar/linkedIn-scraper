@@ -13,16 +13,30 @@ COUNTRIES = [
     "South Korea", "Singapore"
 ]
 
+USED = [
 
-def get_location():
-    return random.choice(COUNTRIES)
+]
 
 
-def get_url(page_number=0):
+def get_country():
+    if len(USED) != len(COUNTRIES):
+        random.shuffle(COUNTRIES)
+        result = next((
+            country for country in COUNTRIES if country not in USED),
+            None
+        )
+        USED.append(result)
+        return result
+    else:
+        USED.clear()
+        return get_country()
+
+
+def get_url(page_number=0, location=None):
     url = "https://www.linkedin.com/jobs/search"
     params = {
         "keywords": "Python Backend",
-        "location": get_location(),
+        "location": location,
         "trk": "public_jobs_jobs-search-bar_search-submit",
         "position": 1,
         "pageNum": page_number,
