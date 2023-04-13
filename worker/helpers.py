@@ -16,22 +16,20 @@ COUNTRIES = [
     "South Korea", "Singapore"
 ]
 
-USED = [
-
-]
 
 
-def get_country():
-    if len(USED) != len(COUNTRIES):
+def get_country(used: list):
+    if len(used) != len(COUNTRIES):
         random.shuffle(COUNTRIES)
         result = next((
-            country for country in COUNTRIES if country not in USED),
+            country for country in COUNTRIES if country not in used),
             None
         )
-        USED.append(result)
-        return result
+        used.append(result)
+        loguru.logger.info(f"Total Country Left: {len(COUNTRIES)-len(used)}")
+        return (result, used)
     else:
-        USED.clear()
+        used.clear()
         loguru.logger.info("Sleeping for 6hours as all countries are finished")
         time.sleep(6*60*60)
         return get_country()
