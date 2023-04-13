@@ -27,6 +27,8 @@ class AppSettings(BaseAppSettings):
     max_pagination: int = 100
     database_url: PostgresDsn
     redis_url: RedisDsn
+    telegram_token: str
+    telegram_chat_id: str
     redis_max_connections: int = 100
     max_connection_count: int = 10
     min_connection_count: int = 10

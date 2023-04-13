@@ -52,4 +52,5 @@ def get_redis_db():
 def get_base():
     return declarative_base()
 
+
 Base = get_base()
