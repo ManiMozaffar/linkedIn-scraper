@@ -4,6 +4,8 @@ from playwright.async_api import Page
 from functools import wraps
 import traceback
 import asyncio
+import time
+import loguru
 
 COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Greece",
@@ -30,6 +32,8 @@ def get_country():
         return result
     else:
         USED.clear()
+        loguru.logger.info("Sleeping for 6hours as all countries are finished")
+        time.sleep(6*60*60)
         return get_country()
 
 

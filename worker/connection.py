@@ -18,7 +18,7 @@ def does_ads_exists(ads):
 
 async def create_ads(
         ads_id, location, body, company_name, title, source, employement_type,
-        level, country, proxy=None
+        level, country
 ):
     async with async_playwright() as main_driver:
         chatgpt_browser = await main_driver.firefox.launch(
@@ -36,7 +36,7 @@ async def create_ads(
             accept_downloads=True,
             is_mobile=False,
             has_touch=False,
-            proxy=proxy
+            proxy=get_random_proxy()
         )
         chatgpt_page = await chatgpt_context.new_page()
         await chatgpt_page.add_init_script(

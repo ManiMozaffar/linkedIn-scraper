@@ -1,7 +1,7 @@
 from typing import Callable
 from loguru import logger
 from core.settings.app import AppSettings
-from db import engine, AsyncSession, get_redis_db
+from db import engine, AsyncSession
 from services import create_all_tables
 
 app_settings = AppSettings()
@@ -16,7 +16,7 @@ def create_start_app_handler() -> Callable:
 
         create_tables = create_all_tables()
         logger.info("Connection established")
-        get_redis_db().test_connection()
+        # get_redis_db().test_connection()
         await create_tables
     return start_app
 

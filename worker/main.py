@@ -12,12 +12,11 @@ import loguru
 @helpers.recursive_handler
 async def scrape_linkedin(*args, **kwargs):
     while True:
-        proxy = connection.get_random_proxy()
         async with async_playwright() as driver:
             country = helpers.get_country()
             print(country)
             browser = await driver.firefox.launch(
-                headless=True,
+                headless=False,
                 args=[
                     '--start-maximized',
                     '--foreground',
@@ -32,7 +31,7 @@ async def scrape_linkedin(*args, **kwargs):
                 accept_downloads=True,
                 is_mobile=False,
                 has_touch=False,
-                proxy=proxy
+                proxy=connection.get_random_proxy()
             )
 
             page = await context.new_page()
@@ -50,7 +49,9 @@ async def scrape_linkedin(*args, **kwargs):
             )
             await page.goto(helpers.get_url(location=country))
             total_num = int(
-                await page.locator(xpaths.JOB_TOTAL_NUM).text_content(timeout=5000)
+                await page.locator(xpaths.JOB_TOTAL_NUM).text_content(
+                    timeout=5000
+                )
             )
             total_num = 100 if total_num > 100 else total_num
 
@@ -82,20 +83,19 @@ async def scrape_linkedin(*args, **kwargs):
                     # employement_type = await helpers.safe_get_element_text(
                     #     page, xpaths.EMPLOYEMENT_TYPE, timeout=100
                     # )
-                    await page.locator(xpaths.SHOW_MORE).click(timeout=5000)
-                    info = await helpers.get_element_text(
-                        page, xpaths.BODY_INFO, False, timeout=5000
-                    )
-                    await connection.create_ads(
-                        ads_id, location, info.strip(), company_name,
-                        title, 1, employement_type="", level="",
-                        country=country, proxy=proxy
-                    )
-                    loguru.logger.info(f"Finished {ads_id}")
-                    await asyncio.sleep(random.randint(4, 10))
-                
+                    # await page.locator(xpaths.SHOW_MORE).click(timeout=5000)
+                    # info = await helpers.get_element_text(
+                    #     page, xpaths.BODY_INFO, False, timeout=5000
+                    # )
+                    # await connection.create_ads(
+                    #     ads_id, location, info.strip(), company_name,
+                    #     title, 1, employement_type="", level="",
+                    #     country=country,
+                    # )
+                    # loguru.logger.info(f"Finished {ads_id}")
+                    # await asyncio.sleep(random.randint(4, 10))
+
                 else:
                     loguru.logger.info(f"{ads_id} Already exists")
-
 
 asyncio.run(scrape_linkedin())
