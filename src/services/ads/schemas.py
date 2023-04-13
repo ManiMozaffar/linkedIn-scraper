@@ -32,7 +32,7 @@ class AdsUpdate(BaseModel):
 
 
 class AdsQuery(BaseModel):
-    ads_id: Optional[int]
+    ads_id: Optional[str]
     location: Optional[str]
     company_name: Optional[str]
     source: Optional[int]

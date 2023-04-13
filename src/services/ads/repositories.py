@@ -23,12 +23,12 @@ class AdsCrud(CRUD):
             )
         
         text = f"""
-#Python #{data.get("country")} #Linkedin
-Title: {data.get("title")}
+**{data.get("title")}**
+#{data.get("country")} #Linkedin
+
+
 Location: {data.get("location")}
 Company: {data.get("company_name")}
-Type: {data.get("employement_type")}
-Level: {data.get("level")}
 
 
 {data.get("body", "")}
@@ -82,19 +82,19 @@ async def get_all_ads(
 
 
 @router.get("/{ads_id}", response_model=AdsOut)
-async def get_ads(ads_id: int, db: AsyncSession = Depends(get_db)):
+async def get_ads(ads_id: str, db: AsyncSession = Depends(get_db)):
     return await AdsCrud(
         Ads, AdsCreate, AdsUpdate, AdsCrud.verbose_name
     ).read_single(
-        db, id=ads_id
+        db, ads_id=ads_id
     )
 
 
 @router.put("/{ads_id}", response_model=AdsOut)
 async def update_ads(
-    ads_id: int, data: AdsUpdate, db: AsyncSession = Depends(get_db)
+    ads_id: str, data: AdsUpdate, db: AsyncSession = Depends(get_db)
 ):
     data: dict = data.dict(exclude_unset=True, exclude_defaults=True)
     return await AdsCrud(
         Ads, AdsCreate, AdsUpdate, AdsCrud.verbose_name
-    ).update(db, id=ads_id, data=dict(data))
+    ).update(db, ads_id=ads_id, data=dict(data))

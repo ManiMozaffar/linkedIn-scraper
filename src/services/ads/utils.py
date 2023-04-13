@@ -1,11 +1,15 @@
 import requests
 from db import get_app_settings
+import re
 
 
-def send_message_to_telegram(chat_id, message_text, button_text, button_url):
+def send_message_to_telegram(
+        chat_id, message_text, button_text, button_url, 
+):
     payload = {
         'chat_id': chat_id,
         'text': message_text,
+        'parse_mode': 'Markdown',
         'reply_markup': {
             'inline_keyboard': [[{
                 'text': button_text,

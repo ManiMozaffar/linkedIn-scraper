@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 from playwright.async_api import Page
 from functools import wraps
 import traceback
+import asyncio
 
 COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Greece",
@@ -62,8 +63,21 @@ async def get_element_text(page: Page, xpath: str, replace=True, timeout=None):
         return result
 
 
-async def fill_form(page: Page, xpath: str, text: str):
-    return await page.locator(xpath).fill(text)
+async def fill_form(page: Page, xpath: str, text: str, timeout=None):
+    return await page.locator(xpath).fill(text, timeout=timeout)
+
+
+def recursive_handler(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except Exception as e:
+            print(f"An error occurred in function {func.__name__} with {args} & {kwargs}: {e}")
+            traceback.print_exc()
+            await asyncio.sleep(60)
+            return await wrapper(*args, **kwargs)
+    return wrapper
 
 
 def exception_handler(func):
@@ -84,5 +98,5 @@ async def safe_get_element_text(page: Page, xpath: str, replace=True, timeout=No
 
 
 @exception_handler
-async def safe_fill_form(page: Page, xpath: str, text: str):
-    return await fill_form(page, xpath, text)
+async def safe_fill_form(page: Page, xpath: str, text: str, timeout=None):
+    return await fill_form(page, xpath, text, timeout)
