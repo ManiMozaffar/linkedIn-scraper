@@ -8,7 +8,8 @@ EMPLOYEMENT_TYPE = f'({BASE_SPAN})[2]'
 BODY_INFO = '//div[contains(@class, "show-more-less-html__markup")]'
 COMPANY_NAME = '//a[contains(@class, "name-link")]'
 LOCATION = '//span[@class="topcard__flavor topcard__flavor--bullet"]'
-TITLE = '//a[@class="topcard__link"]//h2'
+JOB_ID_A_TAG = '//a[@class="topcard__link"]'
+TITLE = f'{JOB_ID_A_TAG}//h2'
 
 
 GPT_FILL = '//textarea[@class="n-input__textarea-el"]'

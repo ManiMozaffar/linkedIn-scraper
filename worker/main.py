@@ -53,11 +53,12 @@ async def scrape_linkedin(used_countries, *args, **kwargs):
             await asyncio.sleep(2)
             if index == 100:
                 break
-            ads_id = await div.get_attribute('data-entity-urn')
-            ads_id = ads_id.split("urn:li:jobPosting:")[1]
             await div.click(
                 timeout=5000
             )
+            title_a_tag = page.locator(xpaths.JOB_ID_A_TAG)
+            ads_id = await title_a_tag.get_attribute('href')
+            ads_id = ads_id.split("?refId")[0].split("-")[-1]
             if not connection.does_ads_exists(ads_id):
                 company_name = await helpers.safe_get_element_text(
                     page, xpaths.COMPANY_NAME, timeout=5000
