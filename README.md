@@ -16,6 +16,8 @@ After collecting the job postings, the Playwright-LinkedIn-Scraper can send them
 3. **Customized Preferences:** The scraper allows you to filter results based on your customized preferences, such as location, job title, skills, or experience level.
 4. **Telegram Integration:** The scraped data can be automatically sent to a Telegram chat or channel, making it easy to share with your community, track for personal use, or analyze.
 5. **ChatGPT Analysis:** Uses ChatGPT to analyze the LinkedIn advertisement, and find the hard skills required from the job description, without having the overhead of using chatgpt API and instead used another chatgpt service provider to keep the running cost low.
+6. **Translation**: Uses ChatGPT to translate the LinkedIn advertisement
+7. **Visa Sponsership Analysis**: Uses chatgpt to analyse if the company sponsers visa or not.
 
 
 ## Installation

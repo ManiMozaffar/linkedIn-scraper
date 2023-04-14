@@ -47,23 +47,14 @@ async def scrape_linkedin(used_countries, *args, **kwargs):
             constants.SPOOF_FINGERPRINT % helpers.generate_device_specs()
         )
         await page.goto(helpers.get_url(location=country))
-        total_num = int(
-            await page.locator(xpaths.JOB_TOTAL_NUM).text_content(
-                timeout=5000
-            )
-        )
-        total_num = 100 if total_num > 100 else total_num
-
-        loguru.logger.info(f"Found {total_num} related jobs")
-        for index in range(1, total_num+1):
-            div = page.locator(
-                f'({xpaths.JOB_LI})[{index}]//div[@data-entity-urn]'
-            )
+        all_ads = await page.locator(xpaths.JOB_LI).all()
+        loguru.logger.info(f"Found {len(all_ads)} Advertisements")
+        for index, div in enumerate(all_ads):
+            await asyncio.sleep(2)
+            if index == 100:
+                break
             ads_id = await div.get_attribute('data-entity-urn')
             ads_id = ads_id.split("urn:li:jobPosting:")[1]
-            await div.hover(
-                timeout=5000
-            )
             await div.click(
                 timeout=5000
             )
@@ -93,7 +84,6 @@ async def scrape_linkedin(used_countries, *args, **kwargs):
                     country=country,
                 )
                 loguru.logger.info(f"Finished {ads_id}")
-                await asyncio.sleep(random.randint(4, 10))
 
             else:
                 loguru.logger.info(f"{ads_id} Already exists")
