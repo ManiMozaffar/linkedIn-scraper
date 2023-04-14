@@ -8,6 +8,7 @@ import helpers
 import xpaths
 import json
 import loguru
+import prompt
 
 host = "http://127.0.0.1:8000"
 
@@ -49,23 +50,9 @@ async def create_ads(
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
-            PROMPTS:
-            1. Act as recruiter who rewievs other advertisement
-            2. List Hard Skill required for this job advertisement, write them briefly in fewer words
-            3. DO NOT write anything else in response than the list
-            4. Translate To English If Needed
-            5. At first word, write 'Sponser Status: Yes' if you think the company offers visa sponsership, 
-            and ''Sponser Status: N/A' if you're not sure, and 'Sponser Status: No' if you're sure it doesn't. 
-            6. Make sure you write the sponser status at least one of these. 
+            Company Name is {company_name}
 
-            
-            SAMPLE OUTOUT:
-            Sponser Status: Yes
-            1. Python
-            2. Django
-
-
-            Job Description:
+            {prompt.CHATGPT}
             {body}
             """,
             timeout=5000
