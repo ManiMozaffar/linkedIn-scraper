@@ -17,7 +17,6 @@ COUNTRIES = [
 ]
 
 
-
 def get_country(used: list):
     if len(used) != len(COUNTRIES):
         random.shuffle(COUNTRIES)
@@ -32,7 +31,7 @@ def get_country(used: list):
         used.clear()
         loguru.logger.info("Sleeping for 6hours as all countries are finished")
         time.sleep(6*60*60)
-        return get_country()
+        return get_country(used)
 
 
 def get_url(page_number=0, location=None):
@@ -77,7 +76,7 @@ def recursive_handler(func):
         except Exception as e:
             print(f"An error occurred in function {func.__name__} with {args} & {kwargs}: {e}")
             traceback.print_exc()
-            await asyncio.sleep(60)
+            await asyncio.sleep(3)
             return await wrapper(*args, **kwargs)
     return wrapper
 
