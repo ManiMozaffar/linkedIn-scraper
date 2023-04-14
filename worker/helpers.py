@@ -1,10 +1,10 @@
 import random
-from urllib.parse import urlencode
-from playwright.async_api import Page
-from functools import wraps
+import time
 import traceback
 import asyncio
-import time
+from urllib.parse import urlencode
+from functools import wraps
+from playwright.async_api import Page
 import loguru
 
 COUNTRIES = [
@@ -18,6 +18,16 @@ COUNTRIES = [
 
 
 def get_country(used: list):
+    """
+    Get a country from COUNTRIES list that has not been used before.
+
+    Args:
+        used (list): A list of countries already used.
+
+    Returns:
+        Tuple[str, list]: A tuple containing a random country from the list
+        and a new used list.
+    """
     if len(used) != len(COUNTRIES):
         random.shuffle(COUNTRIES)
         result = next((
@@ -29,12 +39,23 @@ def get_country(used: list):
         return (result, used)
     else:
         used.clear()
-        loguru.logger.info("Sleeping for 6hours as all countries are finished")
-        time.sleep(6*60*60)
+        loguru.logger.info("Sleeping for 3 hours as all countries finished")
+        time.sleep(3*60*60)
         return get_country(used)
 
 
 def get_url(page_number=0, location=None):
+    """
+    Builds URL Parameter for LinkedIn.
+
+    Args:
+        page_number (int, optional): The page number to fetch. Defaults to 0.
+        location (str, optional): The location to search for jobs. Defaults to
+        None.
+
+    Returns:
+        str: The LinkedIn URL with the given parameters.
+    """
     url = "https://www.linkedin.com/jobs/search"
     params = {
         "keywords": "Python Backend",
@@ -43,13 +64,22 @@ def get_url(page_number=0, location=None):
         "position": 1,
         "pageNum": page_number,
         "f_TPR": "r86400",
-        "f_T": "9%2C25169%2C3549%2C100%2C25194"
+        "f_T": "9%2C25169%2C3549%2C100%2C25194",
+        "sortBy": "DD",
+        "f_JT": "F"
     }
     query_params = urlencode(params)
     return f"{url}?{query_params}"
 
 
 def generate_device_specs():
+    """
+    Generate random RAM/Hardware Concurrency.
+
+    Returns:
+        Tuple[int, int]: A tuple containing a random RAM and hardware
+        concurrency.
+    """
     random_ram = random.choice([1, 2, 4, 8, 16, 32, 64])
     max_hw_concurrency = random_ram * 2 if random_ram < 64 else 64
     random_hw_concurrency = random.choice([1, 2, 4, max_hw_concurrency])
@@ -57,6 +87,20 @@ def generate_device_specs():
 
 
 async def get_element_text(page: Page, xpath: str, replace=True, timeout=None):
+    """
+    Get the text content of an element using its XPath.
+
+    Args:
+        page (Page): The Page object to search for the element.
+        xpath (str): The XPath of the element.
+        replace (bool, optional): Whether to remove newlines and trailing
+        whitespace from the text. Defaults to True.
+        timeout (int, optional): The maximum time to wait for the element.
+        Defaults to None.
+
+    Returns:
+        str: The text content of the element.
+    """
     result: str = await page.locator(xpath).text_content(timeout=timeout)
     if replace:
         return result.strip().replace("\n", "")
@@ -65,10 +109,32 @@ async def get_element_text(page: Page, xpath: str, replace=True, timeout=None):
 
 
 async def fill_form(page: Page, xpath: str, text: str, timeout=None):
+    """
+    Fill a form field with the given text using its XPath.
+
+    Args:
+        page (Page): The Page object containing the form field.
+        xpath (str): The XPath of the form field.
+        text (str): The text to fill into the form field.
+        timeout (int, optional): The maximum time to wait for the form field.
+        Defaults to None.
+
+    Returns:
+        None
+    """
     return await page.locator(xpath).fill(text, timeout=timeout)
 
 
 def recursive_handler(func):
+    """
+    Decorator that handles exceptions and retries the function call.
+
+    Args:
+        func (function): The function to be decorated.
+
+    Returns:
+        function: The decorated function.
+    """
     @wraps(func)
     async def wrapper(*args, **kwargs):
         try:
@@ -82,6 +148,15 @@ def recursive_handler(func):
 
 
 def exception_handler(func):
+    """
+    Decorator that handles exceptions and returns an empty string on failure.
+
+    Args:
+        func (function): The function to be decorated.
+
+    Returns:
+        function: The decorated function.
+    """
     @wraps(func)
     async def wrapper(*args, **kwargs):
         try:
@@ -95,9 +170,36 @@ def exception_handler(func):
 
 @exception_handler
 async def safe_get_element_text(page: Page, xpath: str, replace=True, timeout=None):
+    """
+    Safely get the text content of an element using its XPath.
+
+    Args:
+        page (Page): The Page object to search for the element.
+        xpath (str): The XPath of the element.
+        replace (bool, optional): Whether to remove newlines and trailing
+        whitespace from the text. Defaults to True.
+        timeout (int, optional): The maximum time to wait for the element.
+        Defaults to None.
+
+    Returns:
+        str: The text content of the element, or an empty string on failure.
+    """
     return await get_element_text(page, xpath, replace, timeout=timeout)
 
 
 @exception_handler
 async def safe_fill_form(page: Page, xpath: str, text: str, timeout=None):
-    return await fill_form(page, xpath, text, timeout)
+    """
+    Safely fill a form field with the given text using its XPath.
+
+    Args:
+        page (Page): The Page object containing the form field.
+        xpath (str): The XPath of the form field.
+        text (str): The text to fill into the form field.
+        timeout (int, optional): The maximum time to wait for the form field.
+        Defaults to None.
+
+    Returns:
+        None
+    """
+    return await fill_form(page, xpath, text, timeout=timeout)

@@ -10,7 +10,15 @@ import loguru
 
 
 @helpers.recursive_handler
-async def scrape_linkedin(used_countries, *args, **kwargs):
+async def scrape_linkedin(used_countries: list, *args, **kwargs) -> list:
+    """
+    Scrape LinkedIn job postings for different countries.
+
+    :param used_countries: List of countries that have been used in previous
+           scraping.
+
+    :return: List of used countries after scraping.
+    """
     async with async_playwright() as driver:
         country, used_countries = helpers.get_country(used_countries)
         loguru.logger.info(country)
@@ -35,7 +43,6 @@ async def scrape_linkedin(used_countries, *args, **kwargs):
 
         page = await context.new_page()
         await page.bring_to_front()
-        # screen_width, screen_height = pyautogui.size()
         await page.set_viewport_size(
             {
                 "width": 1920,
@@ -69,12 +76,6 @@ async def scrape_linkedin(used_countries, *args, **kwargs):
                 title = await helpers.safe_get_element_text(
                     page, xpaths.TITLE, timeout=5000
                 )
-                # level = await helpers.safe_get_element_text(
-                #     page, xpaths.SENIORITY_LEVEL, timeout=100
-                # )
-                # employement_type = await helpers.safe_get_element_text(
-                #     page, xpaths.EMPLOYEMENT_TYPE, timeout=100
-                # )
                 await page.locator(xpaths.SHOW_MORE).click(timeout=5000)
                 info = await helpers.get_element_text(
                     page, xpaths.BODY_INFO, False, timeout=5000

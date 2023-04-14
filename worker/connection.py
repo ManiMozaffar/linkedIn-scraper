@@ -13,14 +13,33 @@ import prompt
 host = "http://127.0.0.1:8000"
 
 
-def does_ads_exists(ads):
+def does_ads_exists(ads) -> bool:
+    """
+    Check if an advertisement already exists in the database.
+
+    :param ads: Advertisement ID to check for existence.
+    :return: True if advertisement exists, False otherwise.
+    """
     return requests.get(f"{host}/api/ads/{ads}").status_code == 200
 
 
 async def create_ads(
         ads_id, location, body, company_name, title, source, employement_type,
         level, country
-):
+) -> None:
+    """
+    Create a new advertisement with the given parameters and save it to the db.
+
+    :param ads_id: The advertisement ID.
+    :param location: The location of the job.
+    :param body: The body text of the advertisement.
+    :param company_name: The name of the company posting the job.
+    :param title: The job title.
+    :param source: The source of the advertisement.
+    :param employement_type: The type of employment
+    :param level: The seniority level of the job.
+    :param country: The country where the job is located.
+    """
     async with async_playwright() as main_driver:
         chatgpt_browser = await main_driver.firefox.launch(
             headless=True,
@@ -63,7 +82,7 @@ async def create_ads(
             event = await chatgpt_page.wait_for_event("response")
             if "chat-process" in event.url:
                 response = event
-        
+
         await response.finished()
         result = await response.text()
         lines = list(filter(None, result.split('\n')))
@@ -80,18 +99,30 @@ async def create_ads(
             "level": level
         }
         resp = requests.post(f"{host}/api/ads", json=data)
+        resp = requests.post(f"{host}/api/ads", json=data)
         if resp.status_code != 200:
-            print(resp.text)
+            loguru.logger.error(resp.text)
 
 
-def create_proxy_url(proxy_dict):
+def create_proxy_url(proxy_dict: dict) -> ProxySettings:
+    """
+    Create a proxy URL from the given proxy dictionary.
+
+    :param proxy_dict: Dictionary containing proxy information.
+    :return: A ProxySettings object with the proxy details.
+    """
     return ProxySettings(
         server=f"http://{proxy_dict['ip_address']}:{proxy_dict['port']}",
         username=proxy_dict['username'], password=proxy_dict['password']
     )
 
 
-def get_random_proxy():
+def get_random_proxy() -> ProxySettings:
+    """
+    Get a random proxy from the available proxy list.
+
+    :return: A ProxySettings object with a random proxy's details.
+    """
     proxy_dict = requests.get(
         f"{host}/api/proxy?order_by=?&page=1&per_page=1"
     ).json()["results"][0]
