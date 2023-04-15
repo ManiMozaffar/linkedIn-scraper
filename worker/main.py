@@ -1,12 +1,16 @@
 import asyncio
-from playwright.async_api import async_playwright
 import random
+
+
+from playwright.async_api import async_playwright
 import pytz
+import loguru
+
+
 import helpers
 import xpaths
 import connection
 import constants
-import loguru
 
 
 @helpers.recursive_handler
@@ -38,7 +42,7 @@ async def scrape_linkedin(used_countries: list, *args, **kwargs) -> list:
             accept_downloads=True,
             is_mobile=False,
             has_touch=False,
-            proxy=connection.get_random_proxy()
+            proxy=helpers.get_random_proxy()
         )
 
         page = await context.new_page()
@@ -66,7 +70,7 @@ async def scrape_linkedin(used_countries: list, *args, **kwargs) -> list:
             title_a_tag = page.locator(xpaths.JOB_ID_A_TAG)
             ads_id = await title_a_tag.get_attribute('href')
             ads_id = ads_id.split("?refId")[0].split("-")[-1]
-            if not connection.does_ads_exists(ads_id):
+            if not helpers.does_ads_exists(ads_id):
                 company_name = await helpers.safe_get_element_text(
                     page, xpaths.COMPANY_NAME, timeout=5000
                 )

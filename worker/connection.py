@@ -1,26 +1,16 @@
+import random
+import json
+
 import requests
 from playwright.async_api import async_playwright
-from playwright._impl._api_structures import ProxySettings
-import constants
-import random
+import loguru
 import pytz
+
+
+import prompt
 import helpers
 import xpaths
-import json
-import loguru
-import prompt
-
-host = "http://127.0.0.1:8000"
-
-
-def does_ads_exists(ads) -> bool:
-    """
-    Check if an advertisement already exists in the database.
-
-    :param ads: Advertisement ID to check for existence.
-    :return: True if advertisement exists, False otherwise.
-    """
-    return requests.get(f"{host}/api/ads/{ads}").status_code == 200
+import constants
 
 
 async def create_ads(
@@ -56,7 +46,7 @@ async def create_ads(
             accept_downloads=True,
             is_mobile=False,
             has_touch=False,
-            proxy=get_random_proxy()
+            proxy=helpers.get_random_proxy()
         )
         chatgpt_page = await chatgpt_context.new_page()
         await chatgpt_page.add_init_script(
@@ -98,32 +88,6 @@ async def create_ads(
             "employement_type": employement_type,
             "level": level
         }
-        resp = requests.post(f"{host}/api/ads", json=data)
-        resp = requests.post(f"{host}/api/ads", json=data)
+        resp = requests.post(f"{constants.HOST}/api/ads", json=data)
         if resp.status_code != 200:
             loguru.logger.error(resp.text)
-
-
-def create_proxy_url(proxy_dict: dict) -> ProxySettings:
-    """
-    Create a proxy URL from the given proxy dictionary.
-
-    :param proxy_dict: Dictionary containing proxy information.
-    :return: A ProxySettings object with the proxy details.
-    """
-    return ProxySettings(
-        server=f"http://{proxy_dict['ip_address']}:{proxy_dict['port']}",
-        username=proxy_dict['username'], password=proxy_dict['password']
-    )
-
-
-def get_random_proxy() -> ProxySettings:
-    """
-    Get a random proxy from the available proxy list.
-
-    :return: A ProxySettings object with a random proxy's details.
-    """
-    proxy_dict = requests.get(
-        f"{host}/api/proxy?order_by=?&page=1&per_page=1"
-    ).json()["results"][0]
-    return create_proxy_url(proxy_dict)

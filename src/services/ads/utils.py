@@ -1,6 +1,5 @@
 import requests
 from db import get_app_settings
-import re
 
 
 def send_message_to_telegram(

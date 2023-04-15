@@ -21,7 +21,7 @@ class AdsCrud(CRUD):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not Accepted, ads_id already exists"
             )
-        
+    
         text = f"""
 **{data.get("title")}**
 #{data.get("country")} #Linkedin

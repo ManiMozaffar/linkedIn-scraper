@@ -4,15 +4,24 @@ import traceback
 import asyncio
 from urllib.parse import urlencode
 from functools import wraps
+
+
 from playwright.async_api import Page
 import loguru
+import requests
+from playwright._impl._api_structures import ProxySettings
+
+
+import constants
+import exceptions
+
 
 COUNTRIES = [
     "Austria", "Belgium", "Bulgaria", "Croatia", "Greece",
-    "Czechia", "Denmark", "Estonia", "Finland", "France",
+    "Czechia", "Denmark", "Finland", "France",
     "Germany", "Hungary", "Ireland", "Italy", "Netherlands",
-    "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden",
-    "United States", "Canada", "Australia", "New Zealand", "Japan",
+    "Poland", "Portugal", "Romania", "Spain", "Sweden",
+    "Canada", "Australia", "New Zealand", "Japan",
     "South Korea", "Singapore"
 ]
 
@@ -39,9 +48,24 @@ def get_country(used: list):
         return (result, used)
     else:
         used.clear()
-        loguru.logger.info("Sleeping for 3 hours as all countries finished")
-        time.sleep(3*60*60)
+        loguru.logger.info("Sleeping for 30 minutes as all countries finished")
+        time.sleep(30*60)
         return get_country(used)
+
+
+def get_random_job():
+    resp: dict = requests.get(
+        "http://127.0.0.1:8000/api/jobs?page=1&per_page=1000"
+    ).json()
+    job_list = list(map(
+        lambda x: x['name'], resp['results']
+    )) if resp.get('results') else None
+
+    if not job_list:
+        raise exceptions.NoJobException(
+            "Please add some jobs to API"
+        )
+    return random.choice(job_list)
 
 
 def get_url(page_number=0, location=None):
@@ -58,13 +82,12 @@ def get_url(page_number=0, location=None):
     """
     url = "https://www.linkedin.com/jobs/search"
     params = {
-        "keywords": "Python Backend",
+        "keywords": get_random_job(),
         "location": location,
         "trk": "public_jobs_jobs-search-bar_search-submit",
         "position": 1,
         "pageNum": page_number,
         "f_TPR": "r86400",
-        "f_T": "9%2C25169%2C3549%2C100%2C25194",
         "sortBy": "DD",
         "f_JT": "F"
     }
@@ -203,3 +226,40 @@ async def safe_fill_form(page: Page, xpath: str, text: str, timeout=None):
         None
     """
     return await fill_form(page, xpath, text, timeout=timeout)
+
+
+def does_ads_exists(ads_id) -> bool:
+    """
+    Check if an advertisement already exists in the database.
+
+    :param ads_id: Advertisement ID to check for existence.
+    :return: True if advertisement exists, False otherwise.
+    """
+    return requests.get(f"{constants.HOST}/api/ads/{int(ads_id)}").status_code == 200
+
+
+def create_proxy_url(proxy_dict: dict) -> ProxySettings:
+    """
+    Create a proxy URL from the given proxy dictionary.
+
+    :param proxy_dict: Dictionary containing proxy information.
+    :return: A ProxySettings object with the proxy details.
+    """
+    return ProxySettings(
+        server=f"http://{proxy_dict['ip_address']}:{proxy_dict['port']}",
+        username=proxy_dict['username'], password=proxy_dict['password']
+    )
+
+
+def get_random_proxy() -> ProxySettings:
+    """
+    Get a random proxy from the available proxy list.
+
+    :return: A ProxySettings object with a random proxy's details.
+    """
+    proxy_dict = requests.get(
+        f"{constants.HOST}/api/proxy?order_by=?&page=1&per_page=1"
+    ).json()["results"]
+    if proxy_dict is None or len(proxy_dict) == 0:
+        raise exceptions.NoProxyException("Please Add A Proxy")
+    return create_proxy_url(proxy_dict[0])

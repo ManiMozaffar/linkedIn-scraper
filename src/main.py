@@ -1,8 +1,9 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
-import logging
 import uvicorn
 
 from core.handlers import http_error_handler, http422_error_handler
