@@ -263,3 +263,9 @@ def get_random_proxy() -> ProxySettings:
     if proxy_dict is None or len(proxy_dict) == 0:
         raise exceptions.NoProxyException("Please Add A Proxy")
     return create_proxy_url(proxy_dict[0])
+
+
+def get_all_keywords() -> list:
+    return requests.get(
+        "http://127.0.0.1:8000/api/tech/keywords"
+    ).json()["result"]

@@ -28,6 +28,7 @@ class AdsUpdate(BaseModel):
     source: int
     employement_type: str
     level: str
+    keywords: Optional[list]
 
 
 class AdsQuery(BaseModel):

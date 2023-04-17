@@ -7,11 +7,12 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
     env_file:
       - .env
     networks:
       - my_network
-  
+
   db:
     container_name: postgres_db
     image: postgres:15
@@ -23,6 +24,26 @@ services:
       - "5432:5432"
     networks:
       - my_network
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    networks:
+      - my_network
+    ports:
+      - "6379:6379"
+  
+  isolated:
+    build: ./isolated
+    ports:
+      - "9999:9999"
+    networks:
+      - my_network
+
+volumes:
+  redis_data:
 
 networks:
   my_network:

@@ -27,7 +27,10 @@ router = APIRouter()
 
 
 @router.post("", response_model=JobOut)
-async def create_job(data: JobCreate, db: AsyncSession = Depends(get_db)):
+async def create_job(
+    data: JobCreate,
+    db: AsyncSession = Depends(get_db),
+):
     data: dict = data.dict()
     return await JobCrud(
         Job, JobCreate, JobUpdate, JobCrud.verbose_name
@@ -46,7 +49,9 @@ async def get_jobs(
     query_params: dict = data.dict(exclude_unset=True, exclude_defaults=True)
     data: dict = query_params.copy()
     query_params.update(paginated_data)
-    base_url = str(request.url_for(request.scope["endpoint"].__name__)).rstrip("/")
+    base_url = str(request.url_for(
+        request.scope["endpoint"].__name__
+    )).rstrip("/")
     return await JobCrud(
             Job, JobCreate, JobUpdate, JobCrud.verbose_name
         ).paginated_read_all(

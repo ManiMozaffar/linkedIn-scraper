@@ -1,8 +1,9 @@
 import random
 import json
+import logging
 
 import requests
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, _generated
 import loguru
 import pytz
 
@@ -11,6 +12,20 @@ import prompt
 import helpers
 import xpaths
 import constants
+
+
+async def get_response_from_theb_ai(chatgpt_page) -> dict:
+    response = None
+    while response is None:
+        event = await chatgpt_page.wait_for_event("response")
+        if "chat-process" in event.url:
+            response = event
+
+    await response.finished()
+    result = await response.text()
+    lines = list(filter(None, result.split('\n')))
+    last_json_obj = json.loads(lines[-1])
+    return last_json_obj
 
 
 async def create_ads(
@@ -59,35 +74,69 @@ async def create_ads(
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
-            Company Name is {company_name}
+Company Name is {company_name}
 
-            {prompt.CHATGPT}
-            {body}
+{prompt.ANALYZE_ADS}
+{body}
             """,
             timeout=5000
         )
         await chatgpt_page.locator(xpaths.GPT_BUTTON).click()
-        response = None
-        while response is None:
-            event = await chatgpt_page.wait_for_event("response")
-            if "chat-process" in event.url:
-                response = event
+        first_resp = await get_response_from_theb_ai(chatgpt_page)
 
-        await response.finished()
-        result = await response.text()
-        lines = list(filter(None, result.split('\n')))
-        last_json_obj = json.loads(lines[-1])
+        await helpers.safe_fill_form(
+            chatgpt_page, xpaths.GPT_FILL,
+            f"""
+KEYWORDS = {helpers.get_all_keywords()}
+
+
+Advertisement:
+{first_resp["text"]}
+Country: {country}
+
+
+{prompt.TAG_ADS}
+            """,
+            timeout=5000
+        )
+        await chatgpt_page.locator(xpaths.GPT_BUTTON).click()
+        second_resp = await get_response_from_theb_ai(chatgpt_page)
+        try:
+            second_resp: list = json.loads(
+                second_resp["text"].replace("'", "\"")
+            )["keywords"]
+            if "#Yes" in first_resp["text"]:
+                second_resp.append("yes")
+            elif "#No" in first_resp["text"]:
+                second_resp.append("no")
+            elif "#NA" in first_resp["text"]:
+                second_resp.append("na")
+            hashtags = ' '.join(set(f"#{tag}" for tag in second_resp))
+            body = f"""
+{first_resp["text"]}
+
+
+{hashtags}
+"""
+            print(hashtags)
+        except (json.JSONDecodeError, KeyError):
+            second_resp = None
+            body = first_resp["text"]
+            logging.error("Could not retrieve tags from second_resp")
+
         data = {
             "ads_id": ads_id,
             "location": location,
             "country": country,
-            "body": last_json_obj["text"],
+            "body": body,
             "company_name": company_name,
             "title": title,
             "source": source,
             "employement_type": employement_type,
-            "level": level
+            "level": level,
         }
+        if second_resp:
+            data["keywords"] = second_resp
         resp = requests.post(f"{constants.HOST}/api/ads", json=data)
         if resp.status_code != 200:
             loguru.logger.error(resp.text)

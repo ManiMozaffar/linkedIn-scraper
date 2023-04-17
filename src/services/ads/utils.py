@@ -1,10 +1,11 @@
 import requests
 from db import get_app_settings
+from typing import Union
 
 
 def send_message_to_telegram(
         chat_id, message_text, button_text, button_url, 
-):
+) -> Union[list, None]:
     payload = {
         'chat_id': chat_id,
         'text': message_text,
@@ -21,7 +22,8 @@ def send_message_to_telegram(
         f'https://api.telegram.org/bot{token}/sendMessage',
         json=payload
     )
-    if resp.status_code != 200:
+    if resp.status_code != 200 or not resp.json()["ok"]:
         print(resp.text)
-
-    return resp
+        return None
+    else:
+        return resp.json()["result"]

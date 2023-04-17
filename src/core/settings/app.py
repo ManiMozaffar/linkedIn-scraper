@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Tuple
 
 from fastapi.security import OAuth2PasswordBearer
 from loguru import logger
-from pydantic import PostgresDsn
+from pydantic import PostgresDsn, RedisDsn
 
 from core.logging import InterceptHandler
 from core.settings.base import BaseAppSettings
@@ -26,6 +26,7 @@ class AppSettings(BaseAppSettings):
     default_pagination: int = 20
     max_pagination: int = 100
     database_url: PostgresDsn
+    redis_url: RedisDsn
     telegram_token: str
     telegram_chat_id: str
     redis_max_connections: int = 100

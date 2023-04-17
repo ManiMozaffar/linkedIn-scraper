@@ -3,8 +3,9 @@ from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from loguru import logger
-from core.config import get_app_settings
 import redis
+
+from core.config import get_app_settings
 
 
 class RedisDatabase:
@@ -21,8 +22,7 @@ class RedisDatabase:
 
     def test_connection(self):
         logger.info("Connecting to Redis")
-        redis_conn = redis.Redis(connection_pool=self.redis_pool)
-        redis_conn.set('test', 'test', ex=1)
+        self.get_connection().set('test', 'test', ex=1)
         logger.info("Connection established")
 
     def get_connection(self) -> redis.Redis:
@@ -45,8 +45,11 @@ async def get_db() -> AsyncGenerator:
         yield session
 
 
+REDIS_DB = RedisDatabase()
+
+
 def get_redis_db():
-    return RedisDatabase()
+    return REDIS_DB.get_connection
 
 
 def get_base():
