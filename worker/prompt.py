@@ -54,7 +54,7 @@ I'm accessing you through a Python script and I need your response in a JSON str
 \n
 INSTRUCTIONS: \n
 1. Read the keywords that i have sent you previously on top of this text. Read the advertisement that I'll send you in below. Detect the matching keywords with keywords I have sent you at first.\n
-2. Keyword the job as one of these options: `backend` `frontend` `devops` `software` `full_stack` or if none match, then label it as `others` \n
+2. Analyze the job from job title, and match it with: `backend` `frontend` `devops` `software` `full_stack` or if none match, then label it as `others` \n
 3. DO NOT CREATE KEYWORDS ON YOUR OWN. ONLY use the provided list of KEYWORDS \n
 4. Use the exact spelling and case of the KEYWORDS provided, as they are case-sensitive. \n
 5. Analyze the KEYWORDS I have sent you carefully. They usually follow python's namespacing rules. (e.g., "c#" to "c_sharp" or ".NET" to "dot_net"). Use the version of keyword I have provided for you \n

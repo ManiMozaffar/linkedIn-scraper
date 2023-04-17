@@ -31,7 +31,6 @@ async def is_user_a_member(message: types.Message, channel_id=channel_id):
         )
 
 
-
 @app.on_message(filters.command("show") & filters.private)
 async def show_keywords(_, message: types.Message):
     if await is_user_a_member(message):
@@ -50,6 +49,19 @@ async def show_keywords(_, message: types.Message):
         )
 
 
+@app.on_message(filters.command("info") & filters.private)
+async def get_info(_, message: types.Message):
+    if await is_user_a_member(message):
+        text = requests.get(
+            f"http://main_app:8000/api/telegram/{int(message.from_user.id)}"
+        ).json().get("result")
+        text = text[0] if len(text) == 1 else "No Query Found"
+        await message.reply_text(
+            text,
+            reply_to_message_id=message.reply_to_message_id
+        )
+
+
 @app.on_message(filters.command("start") & filters.private)
 async def welcome(_, message: types.Message):
     print("HEY!")
@@ -62,7 +74,9 @@ In a very simple language, you can write your filters and query in pure PYTHON e
 Too easy! ```(django or fastapi) and (backend or (fullstack and vuejs) or (frontend and vuejs)) and germany```
 You only need 1 day of python knowledge to write your own logical expression :)
 Please use /show command to see all the possible namespaces and keywords you can filter.
-If you want to setup your filter, simply send it to me here.
+You may use /info to check your current query
+
+If you want to setup your filter, simply write it to me here.
 
 Remember, You must be a member of main channel to be able to use this bot:)
 @linkedin_python
@@ -91,8 +105,11 @@ async def start_filter(_, message: types.Message):
             )
         else:
             error = resp.get('error')
+            text = f"Your query is not done correctly, because: {error}"
+            text += "\n\nPlease write /show to see all available namspaces"
+            text += "\n or /start to see the how-to-use guide!"
             await message.reply_text(
-                f"Your query is not done correctly, because: {error}",
+                text,
                 reply_to_message_id=message.reply_to_message_id
             )
 

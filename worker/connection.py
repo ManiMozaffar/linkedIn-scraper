@@ -92,14 +92,18 @@ Company Name is {company_name}
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
-KEYWORDS = '''{helpers.get_all_keywords()}'''
+PROMPT: Read the the text, then follow up the instructions that is given at the end.
 
-{prompt.TAG_ADS}
+KEYWORDS = '''{helpers.get_all_keywords()}'''
 
 Job Title: {title} \n
 Country: {country} \n
 Advertisement: \n
 {body}
+
+\n \n
+{prompt.TAG_ADS}
+
             """,
             timeout=5000
         )

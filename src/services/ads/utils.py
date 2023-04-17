@@ -1,6 +1,7 @@
 import requests
 from db import get_app_settings
 from typing import Union
+import logging
 
 
 def send_message_to_telegram(
@@ -23,7 +24,7 @@ def send_message_to_telegram(
         json=payload
     )
     if resp.status_code != 200 or not resp.json()["ok"]:
-        print(resp.text)
+        logging.error(resp.text)
         return None
     else:
         return resp.json()["result"]

@@ -2,6 +2,8 @@ from services.tech.repositories import KeyWordCrud
 from services.tel_users.repositories import TelegramCrud
 from db import get_app_settings
 import requests
+import logging
+
 
 class AdsManager(TelegramCrud, KeyWordCrud):
     _context = None
@@ -13,7 +15,7 @@ class AdsManager(TelegramCrud, KeyWordCrud):
         return self._context
 
     def forward_message(self, message_id, from_chat_id, ads_keywords):
-        print(ads_keywords)
+        logging.info(f"ads_keywords={ads_keywords}")
         token = get_app_settings().telegram_token
         all_related_users = self.union_related_user_tech(ads_keywords)
         for user in all_related_users:
@@ -28,12 +30,11 @@ class AdsManager(TelegramCrud, KeyWordCrud):
                     "from_chat_id": from_chat_id,
                     "message_id": message_id
                 }
-                print(user)
-                print(payload)
                 url = f"https://api.telegram.org/bot{token}/forwardMessage"
                 response = requests.post(url, json=payload)
-                print(response.text)
-
+                if response.status_code != 200 or not response.json(
+                ).get("ok"):
+                    logging.error(response.text)
 
 
 async def send_message_to_filtered_users(

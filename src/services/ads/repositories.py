@@ -1,3 +1,4 @@
+import logging
 from services.common import CRUD, PaginationQuery
 from .models import Ads
 from fastapi import (
@@ -67,6 +68,8 @@ Company: {data.get("company_name")}
                     message.get("chat").get("id"),
                     keywords
                 )
+            else:
+                logging.error("Task not started; keywords={keywords}") 
         return result
 
 
