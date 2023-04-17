@@ -1,9 +1,11 @@
 import random
 import json
 import logging
+import asyncio
+
 
 import requests
-from playwright.async_api import async_playwright, _generated
+from playwright.async_api import async_playwright, Page
 import loguru
 import pytz
 
@@ -14,7 +16,7 @@ import xpaths
 import constants
 
 
-async def get_response_from_theb_ai(chatgpt_page) -> dict:
+async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
     response = None
     while response is None:
         event = await chatgpt_page.wait_for_event("response")
@@ -25,6 +27,7 @@ async def get_response_from_theb_ai(chatgpt_page) -> dict:
     result = await response.text()
     lines = list(filter(None, result.split('\n')))
     last_json_obj = json.loads(lines[-1])
+
     return last_json_obj
 
 
@@ -71,6 +74,7 @@ async def create_ads(
         loguru.logger.info(f"Fetched Data {ads_id}")
         loguru.logger.info(f"Started ChatGPT {ads_id}")
         await chatgpt_page.goto("https://chatbot.theb.ai/#/chat/")
+        await asyncio.sleep(1)
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
@@ -83,19 +87,19 @@ Company Name is {company_name}
         )
         await chatgpt_page.locator(xpaths.GPT_BUTTON).click()
         first_resp = await get_response_from_theb_ai(chatgpt_page)
-
+        await chatgpt_page.locator(xpaths.GPT_NEW_CHAT).click()
+        await asyncio.sleep(1)
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
-KEYWORDS = {helpers.get_all_keywords()}
-
-
-Advertisement:
-{first_resp["text"]}
-Country: {country}
-
+KEYWORDS = '''{helpers.get_all_keywords()}'''
 
 {prompt.TAG_ADS}
+
+Job Title: {title} \n
+Country: {country} \n
+Advertisement: \n
+{body}
             """,
             timeout=5000
         )
@@ -140,3 +144,5 @@ Country: {country}
         resp = requests.post(f"{constants.HOST}/api/ads", json=data)
         if resp.status_code != 200:
             loguru.logger.error(resp.text)
+
+        await asyncio.sleep(1)

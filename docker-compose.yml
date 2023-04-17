@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   app:
+    container_name: main_app
     build: .
     ports:
       - "8000:8000"
@@ -36,11 +37,21 @@ services:
       - "6379:6379"
   
   isolated:
+    container_name: isolated
     build: ./isolated
     ports:
       - "9999:9999"
     networks:
       - my_network
+  
+
+  telegram_bot:
+    container_name: telegram_bot
+    build: ./tel
+    networks:
+      - my_network
+    env_file:
+      - .env
 
 volumes:
   redis_data:

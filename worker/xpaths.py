@@ -14,3 +14,4 @@ TITLE = f'{JOB_ID_A_TAG}//h2'
 
 GPT_FILL = '//textarea[@class="n-input__textarea-el"]'
 GPT_BUTTON = '//footer//button[@type]'
+GPT_NEW_CHAT = '//*[contains(text(), "New chat")]'

@@ -36,22 +36,32 @@ Job Description(INPUT):
 """
 
 SAMPLE = {
-    "keywords": ["python", "django", "...."]
+    "keywords": ["python", "django", "backend"]
+}
+
+GOOD_SAMPLE = {
+    "keywords": ["backend", "germany", "dot_net", "c_sharp"]
+}
+
+BAD_SAMPLE = {
+    "keywords": ["back end", "Germany", ".NET", "C#"]
 }
 
 
 TAG_ADS = f"""
-
-
-Hey ChatGPT!
-I'm accessing you through a Python script and I need your response in a JSON string format. Please make sure to ONLY respond using a JSON string and adhere to the following format:
+I'm accessing you through a Python script and I need your response in a JSON string format. Please make sure to ONLY respond using a JSON string and adhere to the following format: \n
 {str(SAMPLE)}
-
-
-INSTRUCTIONS:
-1. Read the advertisement and identify any MATCHING keywords from the provided list. Please note that I have already sent you the advertisement and the list of keywords in this message as above.
-2. Include the matching keywords in your JSON string response using the key 'keywords'.
-3. Use the exact spelling and case of the keywords provided as earlier, they are case-sensitive.
-4. Analyze the keywords carefully, as some may have been renamed to respect Python's namespacing rules (e.g., "c#" to "c_sharp" or ".NET" to "dot_net"). Only include the EXACT MATCHING keywords in your response.
-5. If you find a keyword in the advertisement that is not in the provided list, ignore it. do not mention it in your response.
+\n
+INSTRUCTIONS: \n
+1. Read the keywords that i have sent you previously on top of this text. Read the advertisement that I'll send you in below. Detect the matching keywords with keywords I have sent you at first.\n
+2. Keyword the job as one of these options: `backend` `frontend` `devops` `software` `full_stack` or if none match, then label it as `others` \n
+3. DO NOT CREATE KEYWORDS ON YOUR OWN. ONLY use the provided list of KEYWORDS \n
+4. Use the exact spelling and case of the KEYWORDS provided, as they are case-sensitive. \n
+5. Analyze the KEYWORDS I have sent you carefully. They usually follow python's namespacing rules. (e.g., "c#" to "c_sharp" or ".NET" to "dot_net"). Use the version of keyword I have provided for you \n
+6. If you find a keyword in the advertisement that is not in the provided list, ignore it. Do not write it in your response. Only include results from KEYWORDS i sent you above. \n
+7. Check the country's name that I have provided you, and match them with KEYWORDS i have provided you as well.
+Good Output: {str(SAMPLE)} \n
+Bad Output: {str(BAD_SAMPLE)} \n
+8. Avoid the patterns of Badoutput, follow the patterns of Good Output. \n
+9. Do not stop writing answer unless you have at least included 6 different keyword, with the matching job and country as requested before \n 
 """

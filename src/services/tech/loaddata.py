@@ -2,6 +2,14 @@ VISA_SPONSERSHIP = [
    "yes", "no", "na"
 ]
 
+JOBS = [
+    "backend",
+    "frontend",
+    "software",
+    "full_stack",
+    "others"
+]
+
 COUNTRIES = [
    "austria",
    "belgium",

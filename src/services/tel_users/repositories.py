@@ -26,7 +26,7 @@ class TelegramCrud(RedisCrud):
             "expression": user_expression,
             "filter": ads_keywords
         }
-        resp = requests.Session().post("http://127.0.0.1:9999", json=payload)
+        resp = requests.Session().post("http://isolated:9999", json=payload)
         return resp.json()
 
     def update_user_expression(

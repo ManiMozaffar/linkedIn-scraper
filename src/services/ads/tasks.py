@@ -17,11 +17,12 @@ class AdsManager(TelegramCrud, KeyWordCrud):
         token = get_app_settings().telegram_token
         all_related_users = self.union_related_user_tech(ads_keywords)
         for user in all_related_users:
-            if self.eval(
+            evaluation = self.eval(
                 context=self.context,
                 user_expression=self.get_user_expression(user),
                 ads_keywords=ads_keywords
-            ):
+            )
+            if evaluation.get("evaluation"):
                 payload = {
                     "chat_id": user,
                     "from_chat_id": from_chat_id,

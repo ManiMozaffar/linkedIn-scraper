@@ -148,28 +148,6 @@ async def fill_form(page: Page, xpath: str, text: str, timeout=None):
     return await page.locator(xpath).fill(text, timeout=timeout)
 
 
-def recursive_handler(func):
-    """
-    Decorator that handles exceptions and retries the function call.
-
-    Args:
-        func (function): The function to be decorated.
-
-    Returns:
-        function: The decorated function.
-    """
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            print(f"An error occurred in function {func.__name__} with {args} & {kwargs}: {e}")
-            traceback.print_exc()
-            await asyncio.sleep(3)
-            return await wrapper(*args, **kwargs)
-    return wrapper
-
-
 def exception_handler(func):
     """
     Decorator that handles exceptions and returns an empty string on failure.

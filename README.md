@@ -18,6 +18,12 @@ After collecting the job postings, the Playwright-LinkedIn-Scraper can send them
 5. **ChatGPT Analysis:** Uses ChatGPT to analyze the LinkedIn advertisement, and find the hard skills required from the job description, without having the overhead of using chatgpt API and instead used another chatgpt service provider to keep the running cost low.
 6. **Translation**: Uses ChatGPT to translate the LinkedIn advertisement
 7. **Visa Sponsership Analysis**: Uses chatgpt to analyse if the company sponsers visa or not.
+8. **Telegram Bot Integration**: Uses telegram bot to alert users regarding their filter if they suit the job or not.
+8. **Nested Logical Expression Filter Query**: And here's my favourite one, Ever wanted to buy a jerset set, as red and blue? but perhaps you couldn't filter the website by Red and blue, you could either do as red or blue, but here you can do nested logical expression. A use case would be for me indeed;
+``` (django or fastapi or python) and (netherlands or germany) and (backend or (fullstack and vuejs)) ```
+This filter will match the job, that is either django, fastapi or python has been mentioned as backend and also if fullstack with vuejs finds then it'd be still a match for me, and must be located inside netherlands or germany. Quite cool, innit?
+9 **Isolated Secure System To Evaluate Logical Expression** : Having this said, it's not a good practice to allow user inject python logical expression directly as input, but I guess I made it safe enough by seperating the endpoint for evaluation and some safety lookup before executing the code :) If you're still concerned about user's input, perhaps you can also use online consoles which comes with a fee, or use chatgpt api to analyse if the user's input is safe or not.
+
 
 
 ## Installation
@@ -25,8 +31,9 @@ After collecting the job postings, the Playwright-LinkedIn-Scraper can send them
 To run the project
 1. Create a .env file containing secret key, database information, telegram token and the chat id you want send messages to. 
 2. run the docker build and up command to run the service
-3. Add some proxies to the database
+3. Add some proxies to the database using endpoint, and jobs, and keywords. For keywords you can use the loaddata in keyword's service
 4. Run the worker's main.py. For some reasons I decided to not run playwright in docker.
+5. Start the bot's token_id you gave at top, and insert the boolean expression that you wish to be used
 
 
 ## License
