@@ -90,8 +90,8 @@ Also, don't forget to star my project in github or contribute if you found it co
     )
 
 
-@app.on_message(filters.private)
-async def start_filter(_, message: types.Message):
+@app.on_message(filters.private & ~filters.me)
+async def update_expression(_, message: types.Message):
     if await is_user_a_member(message):
         payload = {"expression": str(message.text)}
         resp: dict = requests.put(

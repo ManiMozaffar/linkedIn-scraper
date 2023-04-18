@@ -59,9 +59,8 @@ INSTRUCTIONS: \n
 4. Use the exact spelling and case of the KEYWORDS provided, as they are case-sensitive. \n
 5. Analyze the KEYWORDS I have sent you carefully. They usually follow python's namespacing rules. (e.g., "c#" to "c_sharp" or ".NET" to "dot_net"). Use the version of keyword I have provided for you \n
 6. If you find a keyword in the advertisement that is not in the provided list, ignore it. Do not write it in your response. Only include results from KEYWORDS i sent you above. \n
-7. Check the country's name that I have provided you, and match them with KEYWORDS i have provided you as well.
 Good Output: {str(SAMPLE)} \n
 Bad Output: {str(BAD_SAMPLE)} \n
-8. Avoid the patterns of Badoutput, follow the patterns of Good Output. \n
-9. Do not stop writing answer unless you have at least included 6 different keyword, with the matching job and country as requested before \n 
+7. Avoid the patterns of Badoutput, follow the patterns of Good Output. \n
+8. Do not stop writing answer unless you have at least included 6 different keyword, with the matching job and country as requested before \n 
 """

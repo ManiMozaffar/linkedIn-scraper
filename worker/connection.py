@@ -97,7 +97,6 @@ PROMPT: Read the the text, then follow up the instructions that is given at the 
 KEYWORDS = '''{helpers.get_all_keywords()}'''
 
 Job Title: {title} \n
-Country: {country} \n
 Advertisement: \n
 {body}
 
@@ -119,6 +118,10 @@ Advertisement: \n
                 second_resp.append("no")
             elif "#NA" in first_resp["text"]:
                 second_resp.append("na")
+            
+            second_resp.append(helpers.format_country(
+                country
+            ))
             hashtags = ' '.join(set(f"#{tag}" for tag in second_resp))
             body = f"""
 {first_resp["text"]}

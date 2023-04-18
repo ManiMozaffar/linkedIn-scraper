@@ -1,8 +1,11 @@
 import json
-from aiohttp import web
 import ast
 import logging
 import re
+
+from aiohttp import web
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def is_safe_expression(node) -> bool:
@@ -52,17 +55,19 @@ def safe_eval(
             raise ValueError("Unsafe expression")
         compiled_expression = compile(ast_expression, '<string>', 'eval')
         evaluation = eval(compiled_expression, {}, context_dict)
-        return {
+        result = {
             "success": True,
             "evaluation": evaluation,
             "namespaces": list(set((re.findall(regex, expression))))
         }
+        logging.info(result)
+        return result
     except Exception as e:
         logging.error(f"Error: {e}")
         return {
             "success": False,
             "evaluation": None,
-            "error": explaination or "Invalid Expression",
+            "error": explaination or f"Invalid Expression -> {str(e)}",
         }
 
 

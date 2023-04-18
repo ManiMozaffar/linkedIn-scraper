@@ -31,7 +31,7 @@ class AdsManager(TelegramCrud, KeyWordCrud):
                     "message_id": message_id
                 }
                 url = f"https://api.telegram.org/bot{token}/forwardMessage"
-                response = requests.post(url, json=payload)
+                response = requests.Session().post(url, json=payload)
                 if response.status_code != 200 or not response.json(
                 ).get("ok"):
                     logging.error(response.text)

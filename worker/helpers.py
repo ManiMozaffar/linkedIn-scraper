@@ -1,7 +1,6 @@
 import random
 import time
 import traceback
-import asyncio
 from urllib.parse import urlencode
 from functools import wraps
 
@@ -16,14 +15,8 @@ import constants
 import exceptions
 
 
-COUNTRIES = [
-    "Austria", "Belgium", "Bulgaria", "Croatia", "Greece",
-    "Czechia", "Denmark", "Finland", "France",
-    "Germany", "Hungary", "Ireland", "Italy", "Netherlands",
-    "Poland", "Portugal", "Romania", "Spain", "Sweden",
-    "Canada", "Australia", "New Zealand", "Japan",
-    "South Korea", "Singapore"
-]
+def format_country(country):
+    return country.lower().replace(" ", "_")
 
 
 def get_country(used: list):
@@ -37,14 +30,16 @@ def get_country(used: list):
         Tuple[str, list]: A tuple containing a random country from the list
         and a new used list.
     """
-    if len(used) != len(COUNTRIES):
-        random.shuffle(COUNTRIES)
+    if len(used) != len(constants.COUNTRIES):
+        random.shuffle(constants.COUNTRIES)
         result = next((
-            country for country in COUNTRIES if country not in used),
+            country for country in constants.COUNTRIES if country not in used),
             None
         )
         used.append(result)
-        loguru.logger.info(f"Total Country Left: {len(COUNTRIES)-len(used)}")
+        loguru.logger.info(
+            f"Total Country Left: {len(constants.COUNTRIES)-len(used)}"
+        )
         return (result, used)
     else:
         used.clear()

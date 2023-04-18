@@ -42,3 +42,12 @@ SPOOF_FINGERPRINT = '''
 '''
 
 HOST = "http://127.0.0.1:8000"
+
+COUNTRIES = [
+    "Austria", "Belgium", "Bulgaria", "Croatia", "Greece",
+    "Czechia", "Denmark", "Finland", "France",
+    "Germany", "Hungary", "Ireland", "Italy", "Netherlands",
+    "Poland", "Portugal", "Romania", "Spain", "Sweden",
+    "Canada", "Australia", "New Zealand", "Japan",
+    "South Korea", "Singapore"
+]

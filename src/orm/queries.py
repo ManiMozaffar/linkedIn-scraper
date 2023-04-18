@@ -54,8 +54,14 @@ class QueryMixin(BaseQuery, SignalMixin):
             self.query = self._apply_prefetch_related(self.query)
         return self
 
-    async def count(self, db_session, stmt) -> int:
-        pass
+    async def count(self, db_session: AsyncSession) -> int:
+        modified_query = self.query.limit(None).offset(None)
+        subquery = modified_query.subquery()
+        count_stmt = select(func.count()).select_from(subquery)
+        result = await db_session.execute(count_stmt)
+        return result.scalar()
+
+
 
     async def create(
         self,
