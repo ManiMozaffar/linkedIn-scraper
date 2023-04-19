@@ -1,15 +1,15 @@
-from services.common import CRUD, PaginationQuery
-from .models import Proxy
-from fastapi import Depends, APIRouter, Request
-from db import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
-from .schemas import ProxyCreate, ProxyUpdate, ProxyOut, ProxyQuery
 from typing import Optional
 
 
-class ProxyCrud(CRUD):
-    verbose_name = "Proxys"
+from fastapi import Depends, APIRouter, Request
+from sqlalchemy.ext.asyncio import AsyncSession
 
+
+from services.common import PaginationQuery
+from .models import Proxy
+from db import get_db
+from .schemas import ProxyCreate, ProxyUpdate, ProxyOut, ProxyQuery
+from .factory import ProxyCrud
 
 router = APIRouter()
 

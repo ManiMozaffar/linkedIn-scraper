@@ -24,7 +24,9 @@ def send_message_to_telegram(
         json=payload
     )
     if resp.status_code != 200 or not resp.json()["ok"]:
-        logging.error(resp.text)
+        logging.error(
+            f"Telegram Message Ddin't sent\nresp={resp.text}\ntext={message_text}"
+        )
         return None
     else:
         return resp.json()["result"]

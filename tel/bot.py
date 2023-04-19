@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 from pyrogram import Client, filters, enums, types
 import requests
+import loguru
+
 
 load_dotenv()
 
@@ -10,6 +12,7 @@ api_id = os.getenv("APP_ID")
 api_hash = os.getenv("HASH_ID")
 bot_token = os.getenv("TELEGRAM_TOKEN")
 channel_id = os.getenv("TELEGRAM_CHAT_ID")
+
 
 app = Client(
     "my_bot", bot_token=bot_token, workers=1, api_id=api_id, api_hash=api_hash
@@ -42,7 +45,6 @@ async def show_keywords(_, message: types.Message):
         ) + (
             "\nhttps://github.com/ManiMozaffar/linkedIn-scraper/blob/main/src/services/tech/loaddata.py"
         )
-        print(text)
         await message.reply_text(
             text,
             reply_to_message_id=message.reply_to_message_id
@@ -52,10 +54,14 @@ async def show_keywords(_, message: types.Message):
 @app.on_message(filters.command("info") & filters.private)
 async def get_info(_, message: types.Message):
     if await is_user_a_member(message):
+        loguru.logger.info(
+            f"Recieved message {message.from_user.id}: {message.text}"
+        )
         text = requests.get(
-            f"http://main_app:8000/api/telegram/{int(message.from_user.id)}"
-        ).json().get("result")
+            f"http://main_app:8000/api/telegram/user/{int(message.from_user.id)}"
+        ).json().get("result", [])
         text = text[0] if len(text) == 1 else "No Query Found"
+        loguru.logger.info(f"Sent message {message.from_user.id}: {text}")
         await message.reply_text(
             text,
             reply_to_message_id=message.reply_to_message_id
@@ -64,7 +70,6 @@ async def get_info(_, message: types.Message):
 
 @app.on_message(filters.command("start") & filters.private)
 async def welcome(_, message: types.Message):
-    print("HEY!")
     text = """
 Hey!
 Welcome to linkedin scrapper, are you annoyed by linkedin terrible filters? don't worry, I've got your back!
@@ -93,25 +98,27 @@ Also, don't forget to star my project in github or contribute if you found it co
 @app.on_message(filters.private & ~filters.me)
 async def update_expression(_, message: types.Message):
     if await is_user_a_member(message):
+        loguru.logger.info(
+            f"Recieved message {message.from_user.id}: {message.text}"
+        )
         payload = {"expression": str(message.text)}
         resp: dict = requests.put(
-            f"http://main_app:8000/api/telegram/{int(message.from_user.id)}",
+            f"http://main_app:8000/api/telegram/user/{int(message.from_user.id)}",
             json=payload
         ).json()
         if resp.get("success"):
-            await message.reply_text(
-                "Thanks, your query was saved successfully",
-                reply_to_message_id=message.reply_to_message_id
-            )
+            text = "Thanks, your query was saved successfully"
         else:
             error = resp.get('error')
             text = f"Your query is not done correctly, because: {error}"
             text += "\n\nPlease write /show to see all available namspaces"
             text += "\n or /start to see the how-to-use guide!"
-            await message.reply_text(
-                text,
-                reply_to_message_id=message.reply_to_message_id
-            )
+
+        loguru.logger.info(f"Sent message {message.from_user.id}: {text}")
+        await message.reply_text(
+            text,
+            reply_to_message_id=message.reply_to_message_id
+        )
 
 if __name__ == "__main__":
     app.run()

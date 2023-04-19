@@ -1,26 +1,16 @@
-from services.common import CRUD
-from .models import Job
+from typing import Optional
+
+
 from fastapi import Depends, APIRouter, Request
-from db import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+
+
+from .models import Job
+from db import get_db
 from .schemas import (
     JobCreate, JobUpdate, JobOut, JobQuery, CustomPaginationQuery
 )
-from typing import Optional
-from fastapi import HTTPException, status
-
-
-class JobCrud(CRUD):
-    verbose_name = "Jobs"
-
-    async def pre_save_check(self, db_session: AsyncSession, data: dict):
-        if await self.model.objects.get(
-            db_session=db_session, name=data.get('name')
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not Accepted, job already exists"
-            )
+from .factory import JobCrud
 
 
 router = APIRouter()

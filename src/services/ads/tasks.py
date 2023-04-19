@@ -1,8 +1,12 @@
-from services.tech.repositories import KeyWordCrud
-from services.tel_users.repositories import TelegramCrud
-from db import get_app_settings
-import requests
 import logging
+
+
+import requests
+
+
+from services.tech.factory import KeyWordCrud
+from services.tel_users.factory import TelegramCrud
+from db import get_app_settings
 
 
 class AdsManager(TelegramCrud, KeyWordCrud):

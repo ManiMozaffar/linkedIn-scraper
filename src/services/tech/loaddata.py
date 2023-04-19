@@ -7,6 +7,9 @@ JOBS = [
     "frontend",
     "software",
     "full_stack",
+    "data_science",
+    "network_engineering",
+    "cybersecurity",
     "others"
 ]
 

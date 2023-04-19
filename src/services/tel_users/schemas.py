@@ -14,3 +14,7 @@ class UserIn(BaseModel):
 
 class UserFilter(BaseModel):
     filters: list
+
+
+class ForwardMessage(BaseModel):
+    message_id: str

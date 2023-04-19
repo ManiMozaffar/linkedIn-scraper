@@ -235,7 +235,8 @@ class RedisCrud:
         keyword: str,
         update_function: Callable,
         max_retries: int = 3,
-        retry_interval: int = 1
+        retry_interval: int = 1,
+        **kwargs
     ) -> Set:
         pipeline = self.db.pipeline()
         retries = 0
@@ -245,7 +246,7 @@ class RedisCrud:
                 current_value = utils.to_set(self.db.get(keyword) or set())
                 update_function(current_value)
                 pipeline.multi()
-                pipeline.set(keyword, utils.to_str(current_value))
+                pipeline.set(keyword, utils.to_str(current_value), **kwargs)
                 pipeline.execute()
                 break
             except redis.WatchError:
@@ -279,13 +280,15 @@ class RedisCrud:
         keyword: str,
         new_data,
         max_retries: int = 3,
-        retry_interval: int = 1
+        retry_interval: int = 1,
+        **kwargs
     ) -> Set:
         return self._update_set_with_function(
             keyword,
             lambda current_value: current_value.update(new_data),
             max_retries,
-            retry_interval
+            retry_interval,
+            **kwargs
         )
 
     def delete(

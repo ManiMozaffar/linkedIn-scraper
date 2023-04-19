@@ -1,8 +1,7 @@
 import random
 import json
-import logging
 import asyncio
-
+import re
 
 import requests
 from playwright.async_api import async_playwright, Page
@@ -26,9 +25,7 @@ async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
     await response.finished()
     result = await response.text()
     lines = list(filter(None, result.split('\n')))
-    last_json_obj = json.loads(lines[-1])
-
-    return last_json_obj
+    return json.loads(lines[-1])
 
 
 async def create_ads(
@@ -80,7 +77,8 @@ async def create_ads(
             f"""
 Company Name is {company_name}
 
-{prompt.ANALYZE_ADS}
+{prompt.ANALYZE_ADS} \n
+
 {body}
             """,
             timeout=5000
@@ -94,8 +92,10 @@ Company Name is {company_name}
             f"""
 PROMPT: Read the the text, then follow up the instructions that is given at the end.
 
-KEYWORDS = '''{helpers.get_all_keywords()}'''
-
+KEYWORDS_LIST = '''{helpers.get_all_keywords()}'''
+\n
+\n
+\n
 Job Title: {title} \n
 Advertisement: \n
 {body}
@@ -109,20 +109,25 @@ Advertisement: \n
         await chatgpt_page.locator(xpaths.GPT_BUTTON).click()
         second_resp = await get_response_from_theb_ai(chatgpt_page)
         try:
-            second_resp: list = json.loads(
-                second_resp["text"].replace("'", "\"")
-            )["keywords"]
+            second_resp_list = None
+            second_resp_text = re.search(
+                r'\{.*\}', second_resp["text"].replace("'", "\"")
+            )
+            if not second_resp_text:
+                raise ValueError("No valid JSON object found in the last line")
+            second_resp_text = second_resp_text.group()
+            second_resp_list: list = json.loads(second_resp_text)["keywords"]
             if "#Yes" in first_resp["text"]:
-                second_resp.append("yes")
+                second_resp_list.append("yes")
             elif "#No" in first_resp["text"]:
-                second_resp.append("no")
+                second_resp_list.append("no")
             elif "#NA" in first_resp["text"]:
-                second_resp.append("na")
-            
-            second_resp.append(helpers.format_country(
+                second_resp_list.append("na")
+
+            second_resp_list.append(helpers.format_country(
                 country
             ))
-            hashtags = ' '.join(set(f"#{tag}" for tag in second_resp))
+            hashtags = ' '.join(set(f"#{tag}" for tag in second_resp_list))
             body = f"""
 {first_resp["text"]}
 
@@ -130,10 +135,14 @@ Advertisement: \n
 {hashtags}
 """
             print(hashtags)
-        except (json.JSONDecodeError, KeyError):
-            second_resp = None
+        except (json.JSONDecodeError, KeyError, ValueError) as e:
             body = first_resp["text"]
-            logging.error("Could not retrieve tags from second_resp")
+            loguru.logger.error(
+                f"Could not retrieve tags from second_resp because {e.__name__} raised"
+            )
+            loguru.logger.error(
+                f"\n\nsecond_resp={second_resp}\n"
+            )
 
         data = {
             "ads_id": ads_id,
@@ -146,8 +155,8 @@ Advertisement: \n
             "employement_type": employement_type,
             "level": level,
         }
-        if second_resp:
-            data["keywords"] = second_resp
+        if second_resp_list:
+            data["keywords"] = second_resp_list
         resp = requests.post(f"{constants.HOST}/api/ads", json=data)
         if resp.status_code != 200:
             loguru.logger.error(resp.text)
