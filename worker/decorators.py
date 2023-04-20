@@ -1,12 +1,13 @@
 from functools import wraps
 import traceback
 import random
-
+from typing import Callable, Any
+import asyncio
 
 import loguru
 
 
-def exception_handler(func):
+def exception_handler(func: Callable):
     """
     Decorator that handles exceptions and returns an empty string on failure.
 
@@ -27,7 +28,7 @@ def exception_handler(func):
     return wrapper
 
 
-def get_unique_object(func):
+def get_unique_object(func: Callable):
     """
     This decorator maintains a list of used objects and ensures that the
     wrapped function. returns a unique object each time it is called until
@@ -64,3 +65,16 @@ def get_unique_object(func):
             return wrapper(*args, **kwargs)
 
     return wrapper
+
+
+def async_timeout(timeout: float):
+    def decorator(func: Callable) -> Callable:
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+            try:
+                return await asyncio.wait_for(func(*args, **kwargs), timeout)
+            except asyncio.TimeoutError:
+                raise TimeoutError(
+                    f"Function '{func.__name__}' exceeded {timeout} seconds timeout."
+                )
+        return wrapper
+    return decorator

@@ -8,7 +8,6 @@ from playwright.async_api import Page
 import requests
 from playwright._impl._api_structures import ProxySettings
 
-
 import constants
 import exceptions
 import decorators

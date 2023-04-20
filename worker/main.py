@@ -1,6 +1,7 @@
 import asyncio
 import random
 
+
 from playwright.async_api import async_playwright
 import pytz
 import loguru
@@ -112,13 +113,13 @@ async def scrape_linkedin(
 
 
 async def run_scrapers(workers: int = 1):
-    tasks = []
-    for i in range(workers):
-        tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
-        asyncio.sleep(random.randint(1, 3))  # Overhead of browsers launch
-    await asyncio.gather(*tasks)
+    while True:
+        tasks = []
+        for i in range(workers):
+            tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
+            asyncio.sleep(random.randint(1, 3))  # Overhead of browsers launch
+        await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":
-    while True:
-        used_countries = asyncio.run(run_scrapers(workers=5))
+    used_countries = asyncio.run(run_scrapers(workers=5))

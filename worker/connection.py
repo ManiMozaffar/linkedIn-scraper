@@ -4,7 +4,7 @@ import asyncio
 import re
 
 import requests
-from playwright.async_api import async_playwright, Page
+from playwright.async_api import async_playwright, Page, Response
 import loguru
 import pytz
 
@@ -14,17 +14,20 @@ import helpers
 import xpaths
 import constants
 import exceptions
+import decorators
 
 
+@decorators.async_timeout(120)
 async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
     response = None
     while response is None:
         event = await chatgpt_page.wait_for_event("response")
         if "chat-process" in event.url:
-            response = event
+            response: Response = event
 
     await response.finished()
     result = await response.text()
+    assert response.status == 200
     lines = list(filter(None, result.split('\n')))
     return json.loads(lines[-1])
 
