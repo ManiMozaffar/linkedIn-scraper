@@ -1,54 +1,24 @@
 import random
-import time
-import traceback
 from urllib.parse import urlencode
-from functools import wraps
+import functools
+from itertools import product
 
 
 from playwright.async_api import Page
-import loguru
 import requests
 from playwright._impl._api_structures import ProxySettings
 
 
 import constants
 import exceptions
+import decorators
 
 
 def format_country(country):
     return country.lower().replace(" ", "_")
 
 
-def get_country(used: list):
-    """
-    Get a country from COUNTRIES list that has not been used before.
-
-    Args:
-        used (list): A list of countries already used.
-
-    Returns:
-        Tuple[str, list]: A tuple containing a random country from the list
-        and a new used list.
-    """
-    if len(used) != len(constants.COUNTRIES):
-        random.shuffle(constants.COUNTRIES)
-        result = next((
-            country for country in constants.COUNTRIES if country not in used),
-            None
-        )
-        used.append(result)
-        loguru.logger.info(
-            f"Total Country Left: {len(constants.COUNTRIES)-len(used)}"
-        )
-        return (result, used)
-    else:
-        used.clear()
-        loguru.logger.info("Sleeping for 30 minutes as all countries finished")
-        time.sleep(30*60)
-        return get_country(used)
-
-
-def get_random_job():
+def get_jobs():
     resp: dict = requests.get(
         "http://127.0.0.1:8000/api/jobs?page=1&per_page=1000"
     ).json()
@@ -60,10 +30,15 @@ def get_random_job():
         raise exceptions.NoJobException(
             "Please add some jobs to API"
         )
-    return random.choice(job_list)
+    return job_list
 
 
-def get_url(page_number=0, location=None):
+@decorators.get_unique_object
+def get_country_and_job():
+    return list(product(constants.COUNTRIES, get_jobs()))
+
+
+def get_url(job: str, page_number=0, location=None):
     """
     Builds URL Parameter for LinkedIn.
 
@@ -77,7 +52,7 @@ def get_url(page_number=0, location=None):
     """
     url = "https://www.linkedin.com/jobs/search"
     params = {
-        "keywords": get_random_job(),
+        "keywords": job,
         "location": location,
         "trk": "public_jobs_jobs-search-bar_search-submit",
         "position": 1,
@@ -143,28 +118,7 @@ async def fill_form(page: Page, xpath: str, text: str, timeout=None):
     return await page.locator(xpath).fill(text, timeout=timeout)
 
 
-def exception_handler(func):
-    """
-    Decorator that handles exceptions and returns an empty string on failure.
-
-    Args:
-        func (function): The function to be decorated.
-
-    Returns:
-        function: The decorated function.
-    """
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            print(f"An error occurred in function {func.__name__} with {args} & {kwargs}: {e}")
-            traceback.print_exc()
-            return ""
-    return wrapper
-
-
-@exception_handler
+@decorators.exception_handler
 async def safe_get_element_text(page: Page, xpath: str, replace=True, timeout=None):
     """
     Safely get the text content of an element using its XPath.
@@ -183,7 +137,7 @@ async def safe_get_element_text(page: Page, xpath: str, replace=True, timeout=No
     return await get_element_text(page, xpath, replace, timeout=timeout)
 
 
-@exception_handler
+@decorators.exception_handler
 async def safe_fill_form(page: Page, xpath: str, text: str, timeout=None):
     """
     Safely fill a form field with the given text using its XPath.
@@ -238,7 +192,8 @@ def get_random_proxy() -> ProxySettings:
     return create_proxy_url(proxy_dict[0])
 
 
-def get_all_keywords() -> list:
+@functools.lru_cache(maxsize=128)
+def get_all_keywords(cached=0) -> list:
     return requests.get(
         "http://127.0.0.1:8000/api/tech/keywords"
     ).json()["result"]

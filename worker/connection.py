@@ -13,6 +13,7 @@ import prompt
 import helpers
 import xpaths
 import constants
+import exceptions
 
 
 async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
@@ -114,7 +115,9 @@ Advertisement: \n
                 r'\{.*\}', second_resp["text"].replace("'", "\"")
             )
             if not second_resp_text:
-                raise ValueError("No valid JSON object found in the last line")
+                raise exceptions.NoJsonFound(
+                    "No valid JSON object found in the last line"
+                )
             second_resp_text = second_resp_text.group()
             second_resp_list: list = json.loads(second_resp_text)["keywords"]
             if "#Yes" in first_resp["text"]:

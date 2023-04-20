@@ -12,10 +12,13 @@ import connection
 import constants
 
 
-async def scrape_linkedin(used_countries: list = [], *args, **kwargs) -> list:
+async def scrape_linkedin(
+        worker_id: int, *args, **kwargs
+) -> list:
     """
     Scrape LinkedIn job postings for different countries.
 
+    :param worker_id: ID of the worker executing the scraping.
     :param used_countries: List of countries that have been used in previous
            scraping.
 
@@ -23,8 +26,12 @@ async def scrape_linkedin(used_countries: list = [], *args, **kwargs) -> list:
     """
     try:
         async with async_playwright() as driver:
-            country, used_countries = helpers.get_country(used_countries)
-            loguru.logger.info(country)
+            info, is_done = helpers.get_country_and_job()
+            if is_done == 1:
+                loguru.logger.info("Sleeping for 30 minutes, since all jobs have been scraped")
+                asyncio.sleep(60*30)
+            loguru.logger.info(f"[WORKER {worker_id}] This round is: {info}")
+            country, job = info
             browser = await driver.firefox.launch(
                 headless=True,
                 args=[
@@ -56,9 +63,9 @@ async def scrape_linkedin(used_countries: list = [], *args, **kwargs) -> list:
             await page.add_init_script(
                 constants.SPOOF_FINGERPRINT % helpers.generate_device_specs()
             )
-            await page.goto(helpers.get_url(location=country))
+            await page.goto(helpers.get_url(location=country, job=job))
             all_ads = await page.locator(xpaths.JOB_LI).all()
-            loguru.logger.info(f"Found {len(all_ads)} Advertisements")
+            loguru.logger.info(f"[WORKER {worker_id}] Found {len(all_ads)} Advertisements")
             exists = 0
             for index, div in enumerate(all_ads):
                 await asyncio.sleep(2)
@@ -89,24 +96,29 @@ async def scrape_linkedin(used_countries: list = [], *args, **kwargs) -> list:
                         title, 1, employement_type="", level="",
                         country=country,
                     )
-                    loguru.logger.info(f"Finished {ads_id}")
+                    loguru.logger.info(
+                        f"[WORKER {worker_id}] Finished {ads_id}"
+                    )
 
                 else:
-                    loguru.logger.info(f"{ads_id} Already exists")
+                    loguru.logger.info(
+                        f"[WORKER {worker_id}] {ads_id} Already exists"
+                    )
                     exists += 1
 
-        return used_countries
+        return
     except Exception:
-        return await scrape_linkedin(used_countries)
+        return await scrape_linkedin(worker_id)
 
 
 async def run_scrapers(workers: int = 1):
     tasks = []
     for i in range(workers):
-        tasks.append(asyncio.create_task(scrape_linkedin()))
+        tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
+        asyncio.sleep(random.randint(1, 3))  # Overhead of browsers launch
     await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":
     while True:
-        used_countries = asyncio.run(scrape_linkedin(workers=1))
+        used_countries = asyncio.run(run_scrapers(workers=5))
