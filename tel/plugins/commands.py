@@ -77,6 +77,7 @@ async def update_expression(_, message: types.Message):
     )
 
 
+@app.on_message(~filters.me)
 @is_not_user_a_member_of_channel
 async def not_member(_, message: types.Message):
     await message.reply_text(
