@@ -4,7 +4,10 @@ import functools
 from itertools import product
 
 
-from playwright.async_api import Page
+from playwright.async_api import (
+    Page,
+    TimeoutError as PlayWrightTimeOutError
+)
 import requests
 from playwright._impl._api_structures import ProxySettings
 
@@ -153,6 +156,15 @@ async def safe_fill_form(page: Page, xpath: str, text: str, timeout=None):
     """
     return await fill_form(page, xpath, text, timeout=timeout)
 
+
+async def does_element_exists(
+        page: Page, xpath: str, timeout: int = 500
+):
+    try:
+        await page.locator(xpath).wait_for(timeout=timeout)
+        return True
+    except PlayWrightTimeOutError:
+        return False
 
 def does_ads_exists(ads_id) -> bool:
     """

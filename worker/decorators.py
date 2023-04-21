@@ -59,7 +59,7 @@ def get_unique_object(func: Callable):
             loguru.logger.info(
                 f"Total Objects Left: {len(objects)-len(used_objects)}"
             )
-            return (result, len(objects)-len(used_objects))
+            return result
         else:
             used_objects.clear()
             return wrapper(*args, **kwargs)

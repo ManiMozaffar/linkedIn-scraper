@@ -10,6 +10,7 @@ COMPANY_NAME = '//a[contains(@class, "name-link")]'
 LOCATION = '//span[@class="topcard__flavor topcard__flavor--bullet"]'
 JOB_ID_A_TAG = '//a[@class="topcard__link"]'
 TITLE = f'{JOB_ID_A_TAG}//h2'
+NEED_LOGIN = '//*[contains(text(), "Already on Linkedin")]'
 
 
 GPT_FILL = '//textarea[@class="n-input__textarea-el"]'

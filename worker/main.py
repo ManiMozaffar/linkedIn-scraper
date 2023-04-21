@@ -14,24 +14,24 @@ import constants
 
 
 async def scrape_linkedin(
-        worker_id: int, *args, **kwargs
+        worker_id: int, info=None, *args, **kwargs
 ) -> list:
     """
     Scrape LinkedIn job postings for different countries.
 
     :param worker_id: ID of the worker executing the scraping.
-    :param used_countries: List of countries that have been used in previous
-           scraping.
+    :param info: Cached info, if you wish to repeat the process.
 
     :return: List of used countries after scraping.
     """
     try:
         async with async_playwright() as driver:
-            info, is_done = helpers.get_country_and_job()
-            if is_done == 1:
-                loguru.logger.info("Sleeping for 30 minutes, since all jobs have been scraped")
-                asyncio.sleep(60*30)
-            loguru.logger.info(f"[WORKER {worker_id}] This round is: {info}")
+            if info is None:
+                info = helpers.get_country_and_job()
+
+            loguru.logger.info(
+                f"[WORKER {worker_id}] This round is: {info}"
+            )
             country, job = info
             browser = await driver.firefox.launch(
                 headless=True,
@@ -65,8 +65,15 @@ async def scrape_linkedin(
                 constants.SPOOF_FINGERPRINT % helpers.generate_device_specs()
             )
             await page.goto(helpers.get_url(location=country, job=job))
+
+            if await helpers.does_element_exists(page, xpaths.NEED_LOGIN):
+                loguru.logger.info(f"[WORKER {worker_id}] Login Required!")
+                return await scrape_linkedin(worker_id, info)
+
             all_ads = await page.locator(xpaths.JOB_LI).all()
-            loguru.logger.info(f"[WORKER {worker_id}] Found {len(all_ads)} Advertisements")
+            loguru.logger.info(
+                f"[WORKER {worker_id}] Found {len(all_ads)} Advertisements"
+            )
             exists = 0
             for index, div in enumerate(all_ads):
                 await asyncio.sleep(2)

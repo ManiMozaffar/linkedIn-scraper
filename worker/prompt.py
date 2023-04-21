@@ -16,7 +16,7 @@ INSTRUCTIONS:\n
 2. Translate non-English content to English. \n
 3. Show the company's visa sponsorship status: #Yes, #NA, or #No. \n
 4. Format: `Visa Sponsor: #Yes, #No, or #NA`. \n
-5. Check your 2021 database for the company's sponsorship status. \n
+5. Check your 2021 database for the company's sponsorship status. Maybe in `Job Description` this was mentioned, so give priority to `Job Description` than your database \n
 6. Provide a definite sponsorship status if possible, avoiding '#NA'. \n
 7. Include programming languages in frameworks from `Job Description`, if applicable. \n
 ----------- \n
