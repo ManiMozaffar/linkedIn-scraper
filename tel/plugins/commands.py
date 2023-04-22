@@ -6,7 +6,7 @@ from . import bot as app
 from .filters import (
     is_user_a_member_of_channel,
 )
-from tel.constant import START_MESSAGE
+from constant import START_MESSAGE
 
 
 @app.on_message(filters.command("show") & filters.private)

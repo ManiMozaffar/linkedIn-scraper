@@ -30,7 +30,7 @@ class AdsCrud(CRUD):
             )
 
         text = f"""
-**{data.get("title")}**
+{data.get("title")}
 #{data.get("country")} #Linkedin
 
 

@@ -38,7 +38,11 @@ class AdsManager(TelegramCrud, KeyWordCrud):
                 response = requests.Session().post(url, json=payload)
                 if response.status_code != 200 or not response.json(
                 ).get("ok"):
-                    logging.error(response.text)
+                    logging.error(
+                        f"Telegram did not forward because: {response.text}"
+                    )
+                    if "bot was blocked by the user" in response.json().get("description", ""):
+                        self.delete_user(user)
 
 
 async def send_message_to_filtered_users(

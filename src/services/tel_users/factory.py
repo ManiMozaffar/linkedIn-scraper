@@ -26,22 +26,25 @@ class TelegramCrud(RedisCrud):
 
     def update_user_expression(
             self, user_id, context, user_expression, ads_keywords,
-            regex=r'\b(?!\band\b|\bor\b)\w+\b'
     ):
-        old_expression = self.get_user_expression(user_id)
-        if old_expression:
-            for namespace in set(re.findall(regex, old_expression)):
-                print(namespace, [user_id])
-                self.delete(namespace, [user_id])
-
         resp = self.eval(
             context, user_expression, ads_keywords
         )
         if resp.get("success"):
+            self.delete_user(user_id=user_id)
             self.reset_and_add(user_id, [user_expression])
             for namespace in resp.get("namespaces"):
                 self.add(namespace, [user_id, ])
         return resp
+
+    def delete_user(
+            self, user_id, old_expression=None,
+            regex=r'\b(?!\band\b|\bor\b)\w+\b'
+    ):
+        if not old_expression:
+            old_expression = self.get_user_expression(user_id)
+        for namespace in set(re.findall(regex, old_expression)):
+            self.delete(namespace, [user_id])
 
 
 class TelegramRetriever(TelegramCrud, KeyWordCrud):

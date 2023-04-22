@@ -5,12 +5,11 @@ import logging
 
 
 def send_message_to_telegram(
-        chat_id, message_text, button_text, button_url, 
+        chat_id, message_text: str, button_text: str, button_url,
 ) -> Union[list, None]:
     payload = {
         'chat_id': chat_id,
-        'text': message_text,
-        'parse_mode': 'Markdown',
+        'text': "\n".join(line.strip() for line in message_text.split("\n")),
         'reply_markup': {
             'inline_keyboard': [[{
                 'text': button_text,

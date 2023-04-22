@@ -124,7 +124,7 @@ async def run_scrapers(workers: int = 1):
         tasks = []
         for i in range(workers):
             tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
-            asyncio.sleep(random.randint(1, 3))  # Overhead of browsers launch
+            await asyncio.sleep(random.randint(1, 3))  # Overhead of browsers launch
         await asyncio.gather(*tasks)
 
 
