@@ -2,6 +2,8 @@ ANALYZE_ADS = """
 
 TASK:
 Simplify a job advertisement you find while job searching.\n \n
+
+This is a sample output, it IS NOT THE ACTUAL JOB ADVERTISEMENT.\n
 -----------------------
 SAMPLE OUTPUT:
 
@@ -19,8 +21,9 @@ INSTRUCTIONS:\n
 5. Check your 2021 database for the company's sponsorship status. Maybe in `Job Description` this was mentioned, so give priority to `Job Description` than your database \n
 6. Provide a definite sponsorship status if possible, avoiding '#NA'. \n
 7. Include programming languages in frameworks from `Job Description`, if applicable. \n
+8. Remember to not consider `SAMPLE OUTPUT` as the actual job advertisement, which i will send you as `Job Description` below \n
 ----------- \n
-Job Description (INPUT): \n
+Job Description (The Real INPUT): \n
 """
 
 SAMPLE = {
