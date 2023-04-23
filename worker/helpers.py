@@ -14,6 +14,7 @@ from playwright._impl._api_structures import ProxySettings
 import constants
 import exceptions
 import decorators
+import enums
 
 
 def format_country(country):
@@ -37,10 +38,10 @@ def get_jobs():
 
 @decorators.get_unique_object
 def get_country_and_job():
-    return list(product(constants.COUNTRIES, get_jobs()))
+    return list(product(constants.COUNTRIES, get_jobs(), enums.JobModels))
 
 
-def get_url(job: str, page_number=0, location=None):
+def get_url(job: str, mode: enums.JobModels, page_number=0, location=None):
     """
     Builds URL Parameter for LinkedIn.
 
@@ -48,6 +49,7 @@ def get_url(job: str, page_number=0, location=None):
         page_number (int, optional): The page number to fetch. Defaults to 0.
         location (str, optional): The location to search for jobs. Defaults to
         None.
+        mode: Enum mode for the job
 
     Returns:
         str: The LinkedIn URL with the given parameters.
@@ -60,8 +62,8 @@ def get_url(job: str, page_number=0, location=None):
         "position": 1,
         "pageNum": page_number,
         "f_TPR": "r86400",
-        "sortBy": "DD",
-        "f_JT": "F"
+        "f_JT": "F",
+        "f_WT": mode.value
     }
     query_params = urlencode(params)
     return f"{url}?{query_params}"
