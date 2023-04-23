@@ -100,11 +100,11 @@ KEYWORDS_LIST = '''{helpers.get_all_keywords()}'''
 \n
 \n
 \n
-Job Title: {title} \n
-Advertisement: \n
-{body}
+`Job Title`: {title} \n
+`Real Advertisement`: \n
+{first_resp["text"]}
 
-\n \n
+\n \n \n
 {prompt.TAG_ADS}
 
             """,
