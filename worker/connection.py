@@ -15,7 +15,6 @@ import xpaths
 import constants
 import exceptions
 import decorators
-import enums
 
 
 @decorators.async_timeout(120)
@@ -35,7 +34,7 @@ async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
 
 async def create_ads(
         ads_id, location, body, company_name, title, source, employement_type,
-        level, country, job_mode: enums.JobModels
+        level, country
 ) -> None:
     """
     Create a new advertisement with the given parameters and save it to the db.
@@ -49,7 +48,6 @@ async def create_ads(
     :param employement_type: The type of employment
     :param level: The seniority level of the job.
     :param country: The country where the job is located.
-    :param job_mode: The job's mode (remote, etc)
     """
     async with async_playwright() as main_driver:
         chatgpt_browser = await main_driver.firefox.launch(
@@ -102,11 +100,11 @@ KEYWORDS_LIST = '''{helpers.get_all_keywords()}'''
 \n
 \n
 \n
-`Job Title`: {title} \n
-`Real Advertisement`: \n
-{first_resp["text"]}
+Job Title: {title} \n
+Advertisement: \n
+{body}
 
-\n \n \n
+\n \n
 {prompt.TAG_ADS}
 
             """,
@@ -131,7 +129,6 @@ KEYWORDS_LIST = '''{helpers.get_all_keywords()}'''
                 second_resp_list.append("no")
             elif "#NA" in first_resp["text"]:
                 second_resp_list.append("na")
-            second_resp_list.append(job_mode.lower_case_name)
 
             second_resp_list.append(helpers.format_country(
                 country

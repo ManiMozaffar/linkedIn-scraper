@@ -2,12 +2,6 @@ VISA_SPONSERSHIP = [
    "yes", "no", "na"
 ]
 
-JOBS_MODE = [
-    "on_site",
-    "remote",
-    "hybrid"
-]
-
 JOBS = [
     "backend",
     "frontend",
@@ -45,7 +39,6 @@ COUNTRIES = [
    "japan",
    "south_korea",
    "singapore",
-   "turkey"
 ]
 
 
@@ -310,8 +303,7 @@ DATA = {
    "keywords": [
       *VISA_SPONSERSHIP,
       *COUNTRIES,
-      *JOB_RELATED,
-      *JOBS_MODE
+      *JOB_RELATED
    ]
 }
 
