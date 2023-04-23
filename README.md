@@ -5,6 +5,7 @@
 - [Overview](#overview)
 - [Community](#community)
 - [Features](#features)
+- [How To Use](#how-to-use)
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [License](#license)
@@ -45,6 +46,17 @@ After collecting the job postings, the Playwright-LinkedIn-Scraper can send them
 10. **Isolated Secure System To Evaluate Logical Expression** : Having this said, it's not a good practice to allow user inject python logical expression directly as input, but I guess I made it safe enough by seperating the endpoint for evaluation and some safety lookup before executing the code :) If you're still concerned about user's input, perhaps you can also use online consoles which comes with a fee, or use chatgpt api to analyse if the user's input is safe or not.
 
 
+
+## How to use
+
+- 1. First you need to join the telegram's channel and start telegram's bot.
+- 2. Then you need to setup your own filter, according to your needs, simply send it as a text message to bot, here's one sample:
+    ```python 
+    (django or fastapi or python) and (netherlands or germany) and (backend or (fullstack and vuejs))
+    ```
+    this is either django, fastapi or python has been mentioned as backend and also if fullstack with vuejs finds then it'd be still a match for me, and must be located inside netherlands or germany. Quite cool, innit?
+- 3. Verify that your filter is alright by sending /info to the bot
+- 4. Drink your ☕, and wait for the bot to send you latest advertisements according to your filter 🚀
 
 ## Installation
 
