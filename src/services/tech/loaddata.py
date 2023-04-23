@@ -39,6 +39,7 @@ COUNTRIES = [
    "japan",
    "south_korea",
    "singapore",
+   "turkey"
 ]
 
 
