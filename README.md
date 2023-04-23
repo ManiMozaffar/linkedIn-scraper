@@ -1,6 +1,17 @@
 # Playwright-LinkedIn-Scraper
 
 
+## Table Of Contents
+- [Overview](#overview)
+- [Community](#community)
+- [Features](#features)
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [License](#license)
+- [Support and Contributions](#support-and-contributions)
+- [Legal](#legal)
+
+
 ## Overview
 
 The Playwright-LinkedIn-Scraper is a tool that automates the process of collecting job postings, internships, and other opportunities from LinkedIn. It does this by using two powerful framework: Playwright and FastAPI. Playwright is a web automation tool that can navigate websites, click buttons, and scrape data from web pages. FastAPI is a web framework that allows for the creation of APIs in Python, which is the language used in this project.
@@ -9,6 +20,10 @@ The Playwright-LinkedIn-Scraper is customizable, meaning that you can filter the
 
 After collecting the job postings, the Playwright-LinkedIn-Scraper can send them to a Telegram chat or channel of your choice. This allows you to share the job postings with your community or to keep track of them for your personal use. Overall, the Playwright-LinkedIn-Scraper is a powerful and flexible tool that can save you time and effort in your job search.
 
+
+## Community
+- [Telegram's Channel](https://t.me/linkedin_python)
+- [Telegram's Bot](https://t.me/linkedin_python_bot)
 
 
 ## Features
@@ -50,6 +65,11 @@ To run the project
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Support & Contributions
+## Support and Contributions
 
 Please open an issue for any questions, bug reports, or feature requests. Contributions are welcome, and we encourage you to submit a pull request with any improvements or additions.
+
+## Legal
+
+Please note that the following code is not affiliated with, authorized, maintained, sponsored or endorsed by LinkedIn or any of its affiliates or subsidiaries. This is an independent and unofficial project and should be used at your own risk.
+This project is using guest account view and proxy, but we are not responsible for any consequences that may arise from the use of this project.

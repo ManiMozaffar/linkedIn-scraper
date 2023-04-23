@@ -32,7 +32,7 @@ async def scrape_linkedin(
             loguru.logger.info(
                 f"[WORKER {worker_id}] This round is: {info}"
             )
-            country, job = info
+            country, job, job_mode = info
             browser = await driver.firefox.launch(
                 headless=True,
                 args=[
@@ -64,7 +64,9 @@ async def scrape_linkedin(
             await page.add_init_script(
                 constants.SPOOF_FINGERPRINT % helpers.generate_device_specs()
             )
-            await page.goto(helpers.get_url(location=country, job=job))
+            await page.goto(helpers.get_url(
+                location=country, job=job, mode=job_mode
+            ))
 
             if await helpers.does_element_exists(page, xpaths.NEED_LOGIN):
                 loguru.logger.info(f"[WORKER {worker_id}] Login Required!")
@@ -102,7 +104,7 @@ async def scrape_linkedin(
                     await connection.create_ads(
                         ads_id, location, info.strip(), company_name,
                         title, 1, employement_type="", level="",
-                        country=country,
+                        country=country, job_mode=job_mode
                     )
                     loguru.logger.info(
                         f"[WORKER {worker_id}] Finished {ads_id}"
@@ -124,7 +126,7 @@ async def run_scrapers(workers: int = 1):
         tasks = []
         for i in range(workers):
             tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
-            await asyncio.sleep(random.randint(1, 3))  # Overhead of browsers launch
+            await asyncio.sleep(random.randint(1, 3))  # Overhead of browsers
         await asyncio.gather(*tasks)
 
 
