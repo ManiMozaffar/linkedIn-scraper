@@ -18,3 +18,4 @@ class UserFilter(BaseModel):
 
 class ForwardMessage(BaseModel):
     message_id: str
+    from_chat_id: str

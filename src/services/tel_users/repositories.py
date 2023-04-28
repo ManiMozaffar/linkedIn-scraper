@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, BackgroundTasks
 import redis
 from .schemas import (
     UserOut,
@@ -8,6 +8,7 @@ from .schemas import (
 )
 from db import get_redis_db
 from .factory import TelegramCrud, TelegramRetriever
+from . import tasks
 
 router = APIRouter()
 
@@ -64,6 +65,7 @@ async def get_all_users(
     return dict(
         users=TelegramRetriever(db).get_all_active_users()
     )
+    
 
 
 @router.get("/filters")
@@ -73,3 +75,18 @@ async def get_all_filters(
     return dict(
         users=TelegramRetriever(db).get_all_filters()
     )
+
+
+@router.post("/users/forward")
+async def forward_to_all_users(
+    background_tasks: BackgroundTasks,
+    redis_db: redis.Redis = Depends(get_redis_db),
+    data: ForwardMessage = Depends(),
+):
+    background_tasks.add_task(
+                    tasks.forward_message_to_all,
+                    redis_db=redis_db,
+                    message_id=data.dict().get("message_id"),
+                    from_chat_id=data.dict().get("from_chat_id"),
+                )
+    return Response(status_code=status.HTTP_200_OK)

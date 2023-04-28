@@ -119,6 +119,7 @@ class CRUD(BaseCRUD, ConstructorMixin):
             order_by: Optional[str] = None,
             skip: int = None,
             per_page: int = None,
+            get_count: bool = False,
             **kwargs
     ):
         if order_by and order_by != "?":
@@ -129,15 +130,20 @@ class CRUD(BaseCRUD, ConstructorMixin):
                 )
             else:
                 order_by = tuple(order_by.split(","))
-
-        result = await self.model.objects.filter(
+        query = self.model.objects.filter(
             joins=joins,
             order_by=order_by,
             skip=skip,
             limit=per_page,
             **kwargs
-        ).execute(db_session=db_session)
-        return result
+        )
+        count = await query.count(db_session) if get_count else None
+        result = await query.execute(db_session=db_session)
+
+        if get_count:
+            return result, count
+        else:
+            return query
 
     async def paginated_read_all(
             self,
@@ -153,11 +159,10 @@ class CRUD(BaseCRUD, ConstructorMixin):
             query_params.update(order_by=order_by)
 
         skip = (page_num - 1) * per_page
-        results = await self.read_all(
+        results, count = await self.read_all(
             db_session, order_by=order_by, skip=skip, per_page=per_page,
             joins=joins, get_count=True, **kwargs
         )
-        count = 30
         next_page = None
         previous_page = None
 
