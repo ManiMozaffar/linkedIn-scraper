@@ -145,7 +145,7 @@ JOB_RELATED = [
    "chai",
    "sinon",
    "enzyme",
-   "react_testing_library",
+   "react_native",
    "apollo",
    "graphql",
    "relay",
