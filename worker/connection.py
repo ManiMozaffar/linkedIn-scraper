@@ -81,11 +81,7 @@ async def create_ads(
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
-Company Name is {company_name}
-
-{prompt.ANALYZE_ADS} \n
-
-{body}
+{prompt.analyze_ads(company_name, body)} \n
             """,
             timeout=5000
         )
@@ -96,19 +92,7 @@ Company Name is {company_name}
         await helpers.safe_fill_form(
             chatgpt_page, xpaths.GPT_FILL,
             f"""
-PROMPT: Read the the text, then follow up the instructions that is given at the end.
-
-KEYWORDS_LIST = '''{helpers.get_all_keywords()}'''
-\n
-\n
-\n
-`Job Title`: {title} \n
-`Real Advertisement`: \n
-{first_resp["text"]}
-
-\n \n \n
-{prompt.TAG_ADS}
-
+{prompt.get_tag_ads(title, first_resp["text"], helpers.get_all_keywords())}
             """,
             timeout=5000
         )
