@@ -35,7 +35,7 @@ async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
 
 async def create_ads(
         ads_id, location, body, company_name, title, source, employement_type,
-        level, country, job_mode: enums.JobModels
+        level, country, job_mode: enums.JobModels, worker_id: int = 1
 ) -> None:
     """
     Create a new advertisement with the given parameters and save it to the db.
@@ -74,8 +74,8 @@ async def create_ads(
             constants.SPOOF_FINGERPRINT % helpers.generate_device_specs()
         )
         await chatgpt_page.bring_to_front()
-        loguru.logger.info(f"Fetched Data {ads_id}")
-        loguru.logger.info(f"Started ChatGPT {ads_id}")
+        loguru.logger.info(f"[WORKER {worker_id}] Fetched Data {ads_id}")
+        loguru.logger.info(f"[WORKER {worker_id}] Started ChatGPT {ads_id}")
         await chatgpt_page.goto("https://chatbot.theb.ai/#/chat/")
         await asyncio.sleep(1)
         await helpers.safe_fill_form(
@@ -131,10 +131,10 @@ async def create_ads(
         except (json.JSONDecodeError, KeyError, ValueError) as e:
             body = first_resp["text"]
             loguru.logger.error(
-                f"Could not retrieve tags from second_resp because {e.__name__} raised"
+                f"[WORKER {worker_id}] Could not retrieve tags from second_resp because {e.__name__} raised"
             )
             loguru.logger.error(
-                f"\n\nsecond_resp={second_resp}\n"
+                f"\n\n [WORKER {worker_id}] second_resp={second_resp}\n"
             )
 
         data = {
@@ -152,6 +152,8 @@ async def create_ads(
             data["keywords"] = second_resp_list
         resp = requests.post(f"{constants.HOST}/api/ads", json=data)
         if resp.status_code != 200:
-            loguru.logger.error(resp.text)
+            loguru.logger.error(
+                f"WORKER {worker_id}] Status not 200: {resp.text}"
+            )
 
         await asyncio.sleep(1)

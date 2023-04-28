@@ -1,11 +1,9 @@
 import asyncio
 import random
 
-
 from playwright.async_api import async_playwright
 import pytz
 import loguru
-
 
 import helpers
 import xpaths
@@ -14,20 +12,21 @@ import constants
 
 
 async def scrape_linkedin(
-        worker_id: int, info=None, *args, **kwargs
+        worker_id: int, info=None, only_popular=False, *args, **kwargs
 ) -> list:
     """
     Scrape LinkedIn job postings for different countries.
 
     :param worker_id: ID of the worker executing the scraping.
     :param info: Cached info, if you wish to repeat the process.
+    :param only_popular: Only use popular countries.
 
     :return: List of used countries after scraping.
     """
     try:
         async with async_playwright() as driver:
             if info is None:
-                info = helpers.get_country_and_job()
+                info = helpers.get_country_and_job(only_popular)
 
             loguru.logger.info(
                 f"[WORKER {worker_id}] This round is: {info}"
@@ -121,14 +120,19 @@ async def scrape_linkedin(
         return await scrape_linkedin(worker_id)
 
 
-async def run_scrapers(workers: int = 1):
+async def run_scrapers(workers: int = 1, only_popular=False):
     while True:
         tasks = []
         for i in range(workers):
-            tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
+            tasks.append(asyncio.create_task(scrape_linkedin(
+                worker_id=i+1, only_popular=only_popular
+            )))
             await asyncio.sleep(random.randint(1, 3))  # Overhead of browsers
         await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":
-    used_countries = asyncio.run(run_scrapers(workers=5))
+    args = helpers.parse_arguments()
+    used_countries = asyncio.run(run_scrapers(
+        workers=args.workers, only_popular=args.popular
+    ))

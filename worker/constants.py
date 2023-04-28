@@ -51,3 +51,5 @@ COUNTRIES = [
     "Canada", "Australia", "New Zealand", "Japan",
     "South Korea", "Singapore"
 ]
+
+POPULAR_DESTINATION = ["Sweden", "Germany", "Netherlands"]
