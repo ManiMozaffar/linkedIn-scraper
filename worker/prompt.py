@@ -21,9 +21,9 @@ INSTRUCTIONS:\n
 1. Summarize hard skills or requiremenets from the `job_description` in a similiar format like `sample_output`, removing extra unnecessary details, list them as bullet points, max 70 characters each. DO not write more than 6 bullet point, only includes the MOST related and important one.\n
 2. Translate non-English content to English. \n
 3. Format visa sponsership as : `Visa Sponsor: #Yes, #No, or #NA`. \n
-4. Check your 2021 database for the company's sponsorship status using `company_name`. Maybe in `job_description` this was mentioned, if  so give priority to `job_description`, if not then use your database \n
+4. Check your database as of your last date updated for the company's sponsorship status using company's name as `company_name` string. Maybe in `job_description` this was mentioned, if  so give priority to `job_description`, if not then use your database \n
 5. Provide a definite sponsorship status if possible, avoiding '#NA'. \n
-6. Include programming languages in frameworks from `job_description`, if applicable. \n
+6. Include programming languages used as in the frameworks mentioned `job_description`, if applicable. \n
 7. Remember to not consider `sample_output` content as the actual job advertisement, for the acutal job advertisement, i have sent it to you as `job_description`  \n
 ----------- \n
 \n
@@ -60,7 +60,7 @@ bad_output= {str(bad_sample)} \n
 basic_sample = {str(sample)} \n
 
 INSTRUCTIONS: \n
-    1. I'm accessing you through a Python script and I need your response in a JSON string format. Make sure that you only send me this Json, with no other text, otherwise my program would have an exception and would not work perfect. Please make sure to ONLY respond using a JSON string and adhere to the format given as `basic_sample` which was menitoned earlier\n
+    1. I'm accessing you through a programming script and I need your response in a JSON string format. Make sure that you only send me this Json, with no other text, otherwise my program would have an exception and would not work perfect. Please make sure to ONLY respond using a JSON string and adhere to the format given as `basic_sample` which was menitoned earlier\n
     2. Consider `good_output` and `bad_output` and `basic_sample`  as just examples! The actual job advertisement is marked as `job_description` which you need to analyze and match accordingly.
     3. Do not stop writing answer unless you have at least included 5 different keyword/results, make sure they are REALLY RELEVANT, dont just write anything. Write at MAX 8 most related keywords, no more.\n 
     4. Read the `KEYWORD_LIST` that i have sent you at first. Read the `job_description` that have sent you. Check which of the provided `KEYWORD_LIST` are mentioned and required in `job_description`. \n

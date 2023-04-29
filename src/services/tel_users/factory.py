@@ -31,7 +31,10 @@ class TelegramCrud(RedisCrud):
             context, user_expression, ads_keywords
         )
         if resp.get("success"):
-            self.delete_user(user_id=user_id)
+            try:
+                self.delete_user(user_id=user_id)
+            except TypeError:
+                pass
             self.reset_and_add(user_id, [user_expression])
             for namespace in resp.get("namespaces"):
                 self.add(namespace, [user_id, ])
