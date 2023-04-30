@@ -35,7 +35,8 @@ async def get_response_from_theb_ai(chatgpt_page: Page) -> dict:
 
 async def create_ads(
         ads_id, location, body, company_name, title, source, employement_type,
-        level, country, job_mode: enums.JobModels, worker_id: int = 1
+        level, country, job_mode: enums.JobModels, worker_id: int = 1,
+        headless: bool = True
 ) -> None:
     """
     Create a new advertisement with the given parameters and save it to the db.
@@ -53,7 +54,7 @@ async def create_ads(
     """
     async with async_playwright() as main_driver:
         chatgpt_browser = await main_driver.firefox.launch(
-            headless=True,
+            headless=headless,
             args=[
                 '--start-maximized',
                 '--foreground',

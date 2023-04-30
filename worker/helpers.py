@@ -230,5 +230,9 @@ def parse_arguments():
         "-p", "--popular", action="store_true",
         help="Scrape only popular countries."
     )
+    parser.add_argument(
+        "--headless", action="store_true",
+        help="Enable headless mode."
+    )
     args = parser.parse_args()
     return args
