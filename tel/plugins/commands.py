@@ -34,7 +34,7 @@ async def get_info(client, message: types.Message):
         text = requests.get(
             f"http://main_app:8000/api/telegram/user/{int(message.from_user.id)}"
         ).json().get("result", [])
-        text = text[0] if len(text) == 1 else "No Query Found"
+        text = text[0] if len(text) == 1 else "No Filter Found"
         loguru.logger.info(f"Sent message {message.from_user.id}: {text}")
         await message.reply_text(
             text,

@@ -20,7 +20,8 @@ def send_message_to_telegram(
     token = get_app_settings().telegram_token
     resp = requests.post(
         f'https://api.telegram.org/bot{token}/sendMessage',
-        json=payload
+        json=payload,
+        verify=False
     )
     if resp.status_code != 200 or not resp.json()["ok"]:
         logging.error(

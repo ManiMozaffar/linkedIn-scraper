@@ -49,5 +49,7 @@ COUNTRIES = [
     "Germany", "Hungary", "Ireland", "Italy", "Netherlands",
     "Poland", "Portugal", "Romania", "Spain", "Sweden",
     "Canada", "Australia", "New Zealand", "Japan",
-    "South Korea", "Singapore"
+    "South Korea", "Singapore", "Turkey"
 ]
+
+POPULAR_DESTINATION = ["Sweden", "Germany", "Netherlands"]

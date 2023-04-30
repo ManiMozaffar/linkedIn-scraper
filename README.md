@@ -64,7 +64,10 @@ To run the project
 1. Create a .env file containing secret key, database information, telegram token and the chat id you want send messages to. 
 2. run the docker build and up command to run the service
 3. Add some proxies to the database using endpoint, and jobs, and keywords. For keywords you can use the loaddata in keyword's service
-4. Run the worker's main.py. For some reasons I decided to not run playwright in docker.
+4. Run the worker's main.py. For some reasons I decided to not run playwright in docker. Use `w` for concurrency of data mining, use --headless if you wish to run browser in headless, and use -p if you wish to only scrap popular countries.
+```python
+python main.py -w 5 --headless
+```
 5. Start the bot's token_id you gave at top, and insert the boolean expression that you wish to be used
 
 

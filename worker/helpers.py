@@ -2,7 +2,7 @@ import random
 from urllib.parse import urlencode
 import functools
 from itertools import product
-
+import argparse
 
 from playwright.async_api import (
     Page,
@@ -37,8 +37,15 @@ def get_jobs():
 
 
 @decorators.get_unique_object
-def get_country_and_job():
-    return list(product(constants.COUNTRIES, get_jobs(), enums.JobModels))
+def get_country_and_job(is_popular=False):
+    if is_popular:
+        countries = constants.POPULAR_DESTINATION
+    else:
+        countries = constants.COUNTRIES
+
+    return list(product(
+        countries, get_jobs(), enums.JobModels
+    ))
 
 
 def get_url(job: str, mode: enums.JobModels, page_number=0, location=None):
@@ -168,6 +175,7 @@ async def does_element_exists(
     except PlayWrightTimeOutError:
         return False
 
+
 def does_ads_exists(ads_id) -> bool:
     """
     Check if an advertisement already exists in the database.
@@ -210,3 +218,21 @@ def get_all_keywords(cached=0) -> list:
     return requests.get(
         "http://127.0.0.1:8000/api/tech/keywords"
     ).json()["result"]
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-w", "--workers", type=int, default=1,
+        help="Number of workers to run."
+    )
+    parser.add_argument(
+        "-p", "--popular", action="store_true",
+        help="Scrape only popular countries."
+    )
+    parser.add_argument(
+        "--headless", action="store_true",
+        help="Enable headless mode."
+    )
+    args = parser.parse_args()
+    return args

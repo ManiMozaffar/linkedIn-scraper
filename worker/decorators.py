@@ -3,6 +3,7 @@ import traceback
 import random
 from typing import Callable, Any
 import asyncio
+import threading
 
 import loguru
 
@@ -42,27 +43,30 @@ def get_unique_object(func: Callable):
         Callable: A wrapped function that returns a tuple containing a unique object from
                   the list and the list of used objects.
     """
-    used_objects = []
+    used_objects = set()
 
     @wraps(func)
     def wrapper(*args, **kwargs):
         nonlocal used_objects
-        objects = func(*args, **kwargs)
+        with threading.Lock():
+            objects = func(*args, **kwargs)
+            unused_objects = list(set(objects) - used_objects)
+            if len(used_objects) != len(objects) and (
+                len(unused_objects) > 0
+            ):
+                result = random.choice(unused_objects)
 
-        if len(used_objects) != len(objects):
-            random.shuffle(objects)
-            result = next((
-                obj for obj in objects if obj not in used_objects),
-                None
-            )
-            used_objects.append(result)
-            loguru.logger.info(
-                f"Total Objects Left: {len(objects)-len(used_objects)}"
-            )
-            return result
-        else:
-            used_objects.clear()
-            return wrapper(*args, **kwargs)
+                used_objects.add(result)
+                loguru.logger.info(
+                    f"Total Objects Left: {len(unused_objects)-1}"
+                )
+                return result
+            else:
+                used_objects.clear()
+                loguru.logger.info(
+                    "Total Objects Reinitialized"
+                )
+                return wrapper(*args, **kwargs)
 
     return wrapper
 

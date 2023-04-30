@@ -1,11 +1,9 @@
 import asyncio
 import random
 
-
 from playwright.async_api import async_playwright
 import pytz
 import loguru
-
 
 import helpers
 import xpaths
@@ -14,27 +12,27 @@ import constants
 
 
 async def scrape_linkedin(
-        worker_id: int, info=None, *args, **kwargs
-) -> list:
+        worker_id: int, info=None,
+        only_popular=False, headless=False, *args, **kwargs
+):
     """
     Scrape LinkedIn job postings for different countries.
 
     :param worker_id: ID of the worker executing the scraping.
     :param info: Cached info, if you wish to repeat the process.
-
-    :return: List of used countries after scraping.
+    :param only_popular: Only use popular countries.
     """
     try:
         async with async_playwright() as driver:
             if info is None:
-                info = helpers.get_country_and_job()
+                info = helpers.get_country_and_job(only_popular)
 
             loguru.logger.info(
                 f"[WORKER {worker_id}] This round is: {info}"
             )
             country, job, job_mode = info
             browser = await driver.firefox.launch(
-                headless=True,
+                headless=headless,
                 args=[
                     '--start-maximized',
                     '--foreground',
@@ -70,7 +68,10 @@ async def scrape_linkedin(
 
             if await helpers.does_element_exists(page, xpaths.NEED_LOGIN):
                 loguru.logger.info(f"[WORKER {worker_id}] Login Required!")
-                return await scrape_linkedin(worker_id, info)
+                return await scrape_linkedin(
+                    worker_id=worker_id, only_popular=only_popular,
+                    headless=headless, info=info
+                )
 
             all_ads = await page.locator(xpaths.JOB_LI).all()
             loguru.logger.info(
@@ -79,7 +80,7 @@ async def scrape_linkedin(
             exists = 0
             for index, div in enumerate(all_ads):
                 await asyncio.sleep(2)
-                if index == 100 or exists == 7:
+                if index == 100 or exists == 25:
                     break
                 await div.click(
                     timeout=5000
@@ -117,18 +118,31 @@ async def scrape_linkedin(
                     exists += 1
 
         return
-    except Exception:
-        return await scrape_linkedin(worker_id)
+    except helpers.PlayWrightTimeOutError:
+        pass
+    except Exception as e:
+        loguru.logger.error(e)
+    finally:
+        return await scrape_linkedin(
+            worker_id=worker_id, only_popular=only_popular,
+            headless=headless
+        )
 
 
-async def run_scrapers(workers: int = 1):
+async def run_scrapers(workers: int = 1, only_popular=False, headless=True):
     while True:
         tasks = []
         for i in range(workers):
-            tasks.append(asyncio.create_task(scrape_linkedin(worker_id=i+1)))
+            tasks.append(asyncio.create_task(scrape_linkedin(
+                worker_id=i+1, only_popular=only_popular, headless=headless
+            )))
             await asyncio.sleep(random.randint(1, 3))  # Overhead of browsers
         await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":
-    used_countries = asyncio.run(run_scrapers(workers=5))
+    args = helpers.parse_arguments()
+    used_countries = asyncio.run(run_scrapers(
+        workers=args.workers, only_popular=args.popular,
+        headless=args.headless
+    ))
