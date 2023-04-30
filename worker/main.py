@@ -116,7 +116,8 @@ async def scrape_linkedin(
                     exists += 1
 
         return
-    except Exception:
+    except Exception as e:
+        loguru.logger.error(e)
         return await scrape_linkedin(worker_id)
 
 
