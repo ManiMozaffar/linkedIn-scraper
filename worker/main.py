@@ -80,7 +80,7 @@ async def scrape_linkedin(
             exists = 0
             for index, div in enumerate(all_ads):
                 await asyncio.sleep(2)
-                if index == 100 or exists == 25:
+                if index == 100 or exists == 7:
                     break
                 await div.click(
                     timeout=5000

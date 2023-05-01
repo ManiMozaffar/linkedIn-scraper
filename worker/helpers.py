@@ -68,7 +68,7 @@ def get_url(job: str, mode: enums.JobModels, page_number=0, location=None):
         "trk": "public_jobs_jobs-search-bar_search-submit",
         "position": 1,
         "pageNum": page_number,
-        "f_TPR": "r86400",
+        "f_TPR": "r10800",
         "f_JT": "F",
         "f_WT": mode.value
     }
