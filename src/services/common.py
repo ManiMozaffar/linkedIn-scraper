@@ -80,7 +80,10 @@ class BaseCRUD:
         fields = [field.strip("-") for field in order_by.split(",")]
         invalid_fields = set(fields) - set(self.model.__table__.columns.keys())
         if invalid_fields:
-            raise ValueError("order_by contains invalid fields: {}".format(", ".join(invalid_fields)))
+            raise ValueError(
+                "order_by contains invalid fields: {}".format(
+                    ", ".join(invalid_fields)
+                ))
         return True
 
     def is_order_by_valid(self, order_by):
@@ -103,7 +106,9 @@ class CRUD(BaseCRUD, ConstructorMixin):
 
     async def create(self, db_session: AsyncSession, data: dict):
         await self.pre_save_check(db_session, data)
-        instance = await self.model.objects.create(db_session=db_session, **data)
+        instance = await self.model.objects.create(
+            db_session=db_session, **data
+        )
         return instance
 
     async def delete(self, db_session: AsyncSession, joins=set(), **kwargs):
@@ -124,9 +129,12 @@ class CRUD(BaseCRUD, ConstructorMixin):
     ):
         if order_by and order_by != "?":
             if not self.is_order_by_valid(order_by):
+                text = f"{self.verbose_name} with the specified field for"
+                text += "order_by is not found, please use one of"
+                text += f"these fields : {self._order_by_fields}"
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"{self.verbose_name} with the specified field for order_by is not found, please use one of these fields: {self._order_by_fields}"
+                    detail=text
                 )
             else:
                 order_by = tuple(order_by.split(","))
@@ -148,7 +156,7 @@ class CRUD(BaseCRUD, ConstructorMixin):
     async def paginated_read_all(
             self,
             db_session: AsyncSession = Depends(get_db()),
-            joins=set(), order_by: Optional[str] = None, 
+            joins=set(), order_by: Optional[str] = None,
             base_url=None, query_params: dict() = dict(),
             **kwargs
     ):
@@ -172,7 +180,9 @@ class CRUD(BaseCRUD, ConstructorMixin):
             )
             next_page = f"{base_url}?{next_query_params}"
 
-        if (page_num - 1) > 0 and  0 < ((page_num-1) * per_page) < count+per_page:
+        if (page_num - 1) > 0 and 0 < (
+            (page_num-1) * per_page
+        ) < count+per_page:
             prev_query_params = urlencode(
                 {**query_params, "page": page_num - 1}
             )
@@ -193,9 +203,10 @@ class CRUD(BaseCRUD, ConstructorMixin):
             db_session=db_session, joins=joins, **kwargs
         )
         if not result:
+            text = f"{self.verbose_name} with specified filter is not found"
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"{self.verbose_name} with the specified filters is not found"
+                detail=text
             )
         return result
 
@@ -207,9 +218,10 @@ class CRUD(BaseCRUD, ConstructorMixin):
             db_session=db_session, data=data, joins=set(), **kwargs
         )
         if updated_instance is None:
+            text = f"{self.verbose_name} with specified filter is not found"
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"{self.verbose_name} with the specified filters is not found"
+                detail=text
             )
         return updated_instance
 
@@ -290,7 +302,7 @@ class RedisCrud:
     ) -> Set:
         return self._update_set_with_function(
             keyword,
-            lambda current_value: current_value.update(new_data),
+            lambda current_val: current_val.update(new_data),
             max_retries,
             retry_interval,
             **kwargs
@@ -305,7 +317,7 @@ class RedisCrud:
     ) -> Set:
         return self._update_set_with_function(
             keyword,
-            lambda current_value: current_value.difference_update(deleted_data),
+            lambda current_val: current_val.difference_update(deleted_data),
             max_retries,
             retry_interval
         )

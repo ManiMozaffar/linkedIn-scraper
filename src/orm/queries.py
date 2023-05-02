@@ -61,8 +61,6 @@ class QueryMixin(BaseQuery, SignalMixin):
         result = await db_session.execute(count_stmt)
         return result.scalar()
 
-
-
     async def create(
         self,
         db_session: AsyncSession,

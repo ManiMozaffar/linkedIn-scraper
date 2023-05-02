@@ -23,7 +23,9 @@ def exception_handler(func: Callable):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            print(f"An error occurred in function {func.__name__} with {args} & {kwargs}: {e}")
+            loguru.logger.error(
+                f"Error raised at {func.__name__} with {args} & {kwargs}: {e}"
+            )
             traceback.print_exc()
             return ""
     return wrapper
@@ -40,8 +42,8 @@ def get_unique_object(func: Callable):
         func (callable): A function that returns a list of objects.
 
     Returns:
-        Callable: A wrapped function that returns a tuple containing a unique object from
-                  the list and the list of used objects.
+        Callable: A wrapped function that returns a tuple containing a unique
+            object from the list and the list of used objects.
     """
     used_objects = set()
 
@@ -78,7 +80,7 @@ def async_timeout(timeout: float):
                 return await asyncio.wait_for(func(*args, **kwargs), timeout)
             except asyncio.TimeoutError:
                 raise TimeoutError(
-                    f"Function '{func.__name__}' exceeded {timeout} seconds timeout."
+                    f"Function '{func.__name__}' exceeded {timeout} seconds."
                 )
         return wrapper
     return decorator

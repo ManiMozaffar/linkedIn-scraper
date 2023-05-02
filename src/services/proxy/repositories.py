@@ -34,7 +34,9 @@ async def get_Proxys(
     query_params: dict = data.dict(exclude_unset=True, exclude_defaults=True)
     data: dict = query_params.copy()
     query_params.update(paginated_data)
-    base_url = str(request.url_for(request.scope["endpoint"].__name__)).rstrip("/")
+    base_url = str(request.url_for(
+        request.scope["endpoint"].__name__)
+    ).rstrip("/")
     return await ProxyCrud(
             Proxy, ProxyCreate, ProxyUpdate, ProxyCrud.verbose_name
         ).paginated_read_all(

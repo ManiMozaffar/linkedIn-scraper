@@ -25,7 +25,8 @@ def send_message_to_telegram(
     )
     if resp.status_code != 200 or not resp.json()["ok"]:
         logging.error(
-            f"Telegram Message Ddin't sent\nresp={resp.text}\ntext={message_text}"
+            f"""Telegram Message Ddin't sent\nresp={resp.text}
+            text={message_text}"""
         )
         return None
     else:

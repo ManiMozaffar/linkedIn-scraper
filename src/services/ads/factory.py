@@ -45,11 +45,12 @@ Company: {data.get("company_name")}
         sql_creation_data.pop("keywords", None)
         result = await super().create(db_session, sql_creation_data)
         if result.id:
+            ads_id = data.get('ads_id')
             message: dict = send_message_to_telegram(
                 chat_id=get_app_settings().telegram_chat_id,
                 message_text=text,
                 button_text="Apply",
-                button_url=f"https://www.linkedin.com/jobs/view/{data.get('ads_id')}/"
+                button_url=f"https://www.linkedin.com/jobs/view/{ads_id}/"
             )
             keywords = data.get("keywords")
             if keywords and len(keywords) > 0 and message:
