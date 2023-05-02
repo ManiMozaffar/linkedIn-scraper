@@ -65,7 +65,6 @@ async def get_all_users(
     return dict(
         users=TelegramRetriever(db).get_all_active_users()
     )
-    
 
 
 @router.get("/filters")

@@ -41,7 +41,8 @@ class AdsManager(TelegramCrud, KeyWordCrud):
                     logging.error(
                         f"Telegram did not forward because: {response.text}"
                     )
-                    if "bot was blocked by the user" in response.json().get("description", ""):
+                    if "bot was blocked by the user" in response.json(
+                    ).get("description", ""):
                         self.delete_user(user)
 
 

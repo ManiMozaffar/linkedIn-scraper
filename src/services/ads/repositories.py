@@ -37,7 +37,6 @@ async def create_ads(
     return result
 
 
-
 @router.get("", response_model=None)
 async def get_all_ads(
         request: Request,

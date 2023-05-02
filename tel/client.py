@@ -1,6 +1,5 @@
 from pyrogram import Client
 from pyrogram import __version__
-from pyrogram.raw.all import layer
 import loguru
 
 from env_reader import EnvReader
@@ -22,7 +21,8 @@ class LinkedinBot(Client):
         await super().start()
 
         me = await self.get_me()
-        loguru.logger.info(f"linkedIn-scraper on Pyrogram v{__version__} (Layer {layer}) started on @{me.username}.")
+        loguru.logger.info(
+            f"Pyrogram v{__version__} started on @{me.username}.")
 
     async def stop(self, *args):
         await super().stop()

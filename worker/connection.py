@@ -132,7 +132,7 @@ async def create_ads(
         except (json.JSONDecodeError, KeyError, ValueError) as e:
             body = first_resp["text"]
             loguru.logger.error(
-                f"[WORKER {worker_id}] Could not retrieve tags from second_resp because {e.__name__} raised"
+                f"[WORKER {worker_id}] {e.__name__} raised on second resp"
             )
             loguru.logger.error(
                 f"\n\n [WORKER {worker_id}] second_resp={second_resp}\n"

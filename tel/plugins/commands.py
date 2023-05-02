@@ -17,7 +17,9 @@ async def show_keywords(_, message: types.Message):
     text = ' \n'.join(text) + (
         "\n\n\nFor reference please check this url:"
     ) + (
-        "\nhttps://github.com/ManiMozaffar/linkedIn-scraper/blob/main/src/services/tech/loaddata.py"
+        "\nhttps://github.com/ManiMozaffar/linkedIn-scraper"
+    ) + (
+        "/blob/main/src/services/tech/loaddata.py"
     )
     await message.reply_text(
         text,
@@ -32,7 +34,9 @@ async def get_info(client, message: types.Message):
     )
     if await is_user_a_member_of_channel(client, message):
         text = requests.get(
-            f"http://main_app:8000/api/telegram/user/{int(message.from_user.id)}"
+            "http://main_app:8000/api/telegram/user/{}".format(
+                int(message.from_user.id)
+            )
         ).json().get("result", [])
         text = text[0] if len(text) == 1 else "No Filter Found"
         loguru.logger.info(f"Sent message {message.from_user.id}: {text}")
@@ -64,7 +68,9 @@ async def update_expression(client, message: types.Message):
     if await is_user_a_member_of_channel(client, message):
         payload = {"expression": str(message.text)}
         resp: dict = requests.put(
-            f"http://main_app:8000/api/telegram/user/{int(message.from_user.id)}",
+            "http://main_app:8000/api/telegram/user/{}".format(
+                int(message.from_user.id)
+            ),
             json=payload
         ).json()
         if resp.get("success"):

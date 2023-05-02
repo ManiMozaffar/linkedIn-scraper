@@ -11,7 +11,9 @@ FIREFOX_SETTINGS = {
 SPOOF_FINGERPRINT = '''
     (() => {
         delete navigator.__proto__.webdriver;
-        Object.defineProperty(navigator, 'deviceMemory', { value: %d, configurable: true });
+        Object.defineProperty(navigator, 'deviceMemory', {
+            value: %d, configurable: true
+        });
 
         const originalHardwareConcurrency = navigator.hardwareConcurrency;
         const originalPropertyDescriptor = Object.getOwnPropertyDescriptor(

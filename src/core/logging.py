@@ -6,7 +6,7 @@ from loguru import logger
 
 
 class InterceptHandler(logging.Handler):
-    def emit(self, record: logging.LogRecord) -> None:  
+    def emit(self, record: logging.LogRecord) -> None:
         try:
             level = logger.level(record.levelname).name
         except ValueError:

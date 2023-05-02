@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
-from datetime import datetime
+from sqlalchemy import Column, Integer, String
 from db import Base
 from services.common import AbstractModeDateMixin
 

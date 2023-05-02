@@ -68,7 +68,7 @@ def get_url(job: str, mode: enums.JobModels, page_number=0, location=None):
         "trk": "public_jobs_jobs-search-bar_search-submit",
         "position": 1,
         "pageNum": page_number,
-        "f_TPR": "r86400",
+        "f_TPR": "r10800",
         "f_JT": "F",
         "f_WT": mode.value
     }
@@ -130,7 +130,9 @@ async def fill_form(page: Page, xpath: str, text: str, timeout=None):
 
 
 @decorators.exception_handler
-async def safe_get_element_text(page: Page, xpath: str, replace=True, timeout=None):
+async def safe_get_element_text(
+    page: Page, xpath: str, replace=True, timeout=None
+):
     """
     Safely get the text content of an element using its XPath.
 
@@ -183,7 +185,9 @@ def does_ads_exists(ads_id) -> bool:
     :param ads_id: Advertisement ID to check for existence.
     :return: True if advertisement exists, False otherwise.
     """
-    return requests.get(f"{constants.HOST}/api/ads/{int(ads_id)}").status_code == 200
+    return requests.get(
+        f"{constants.HOST}/api/ads/{int(ads_id)}"
+    ).status_code == 200
 
 
 def create_proxy_url(proxy_dict: dict) -> ProxySettings:
