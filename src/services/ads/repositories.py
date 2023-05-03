@@ -43,7 +43,7 @@ async def get_all_ads(
         data: AdsQuery = Depends(),
         db: AsyncSession = Depends(get_db),
         paginated_data: PaginationQuery = Depends(),
-        Ads_by: Optional[str] = None
+        order_by: Optional[str] = None
 ):
     paginated_data: dict = paginated_data.dict(exclude_unset=True)
     query_params: dict = data.dict(exclude_unset=True, exclude_defaults=True)
@@ -56,7 +56,7 @@ async def get_all_ads(
             Ads, AdsCreate, AdsUpdate, AdsCrud.verbose_name
         ).paginated_read_all(
             db,
-            Ads_by=Ads_by,
+            order_by=order_by,
             base_url=base_url,
             query_params=query_params,
             **data
