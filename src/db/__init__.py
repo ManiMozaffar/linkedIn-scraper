@@ -1,5 +1,3 @@
-from collections.abc import AsyncGenerator
-
 from sqlalchemy.orm import declarative_base
 from loguru import logger
 import redis
