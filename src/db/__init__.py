@@ -1,9 +1,7 @@
-from collections.abc import AsyncGenerator
-
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base
 from loguru import logger
 import redis
+from fastapi_integration.db import SqlEngine
 
 from core.config import get_app_settings
 
@@ -29,31 +27,10 @@ class RedisDatabase:
         return redis.Redis(connection_pool=self.redis_pool)
 
 
-engine = create_async_engine(
-    get_app_settings().database_url,
-    future=True,
-    echo=False,
-)
-
-
-async def get_db() -> AsyncGenerator:
-    AsyncSessionFactory = sessionmaker(
-        engine, autoflush=False, expire_on_commit=False, class_=AsyncSession
-    )
-    async with AsyncSessionFactory() as session:
-        logger.debug(f"ASYNC Pool: {engine.pool.status()}")
-        yield session
-
-
+SQL_ENGINE = SqlEngine(get_app_settings())
 REDIS_DB = RedisDatabase()
+Base = declarative_base()
 
 
 def get_redis_db():
     return REDIS_DB.get_connection
-
-
-def get_base():
-    return declarative_base()
-
-
-Base = get_base()

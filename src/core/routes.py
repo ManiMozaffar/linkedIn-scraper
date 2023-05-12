@@ -6,7 +6,7 @@ from services.tel_users.repositories import router as tel_users
 from services.tech.repositories import router as tech_router
 
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 router.include_router(ads_router, tags=["ads"], prefix="/ads")
 router.include_router(proxy_router, tags=["proxy"], prefix="/proxy")
 router.include_router(jobs_router, tags=["jobs"], prefix="/jobs")

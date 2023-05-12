@@ -12,7 +12,7 @@ import redis
 
 from services.common import PaginationQuery
 from .models import Ads
-from db import get_db, get_redis_db
+from db import SQL_ENGINE, get_redis_db
 from .schemas import AdsCreate, AdsUpdate, AdsOut, AdsQuery
 from .factory import AdsCrud
 
@@ -24,7 +24,7 @@ router = APIRouter()
 async def create_ads(
     data: AdsCreate,
     background_tasks: BackgroundTasks,
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(SQL_ENGINE.connection),
     redis_db: redis.Redis = Depends(get_redis_db),
 ):
     data: dict = data.dict()
@@ -41,9 +41,9 @@ async def create_ads(
 async def get_all_ads(
         request: Request,
         data: AdsQuery = Depends(),
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(SQL_ENGINE.connection),
         paginated_data: PaginationQuery = Depends(),
-        Ads_by: Optional[str] = None
+        order_by: Optional[str] = None
 ):
     paginated_data: dict = paginated_data.dict(exclude_unset=True)
     query_params: dict = data.dict(exclude_unset=True, exclude_defaults=True)
@@ -56,7 +56,7 @@ async def get_all_ads(
             Ads, AdsCreate, AdsUpdate, AdsCrud.verbose_name
         ).paginated_read_all(
             db,
-            Ads_by=Ads_by,
+            order_by=order_by,
             base_url=base_url,
             query_params=query_params,
             **data
@@ -64,7 +64,9 @@ async def get_all_ads(
 
 
 @router.get("/{ads_id}", response_model=AdsOut)
-async def get_ads(ads_id: str, db: AsyncSession = Depends(get_db)):
+async def get_ads(
+    ads_id: str, db: AsyncSession = Depends(SQL_ENGINE.connection)
+):
     return await AdsCrud(
         Ads, AdsCreate, AdsUpdate, AdsCrud.verbose_name
     ).read_single(
@@ -74,7 +76,8 @@ async def get_ads(ads_id: str, db: AsyncSession = Depends(get_db)):
 
 @router.put("/{ads_id}", response_model=AdsOut)
 async def update_ads(
-    ads_id: str, data: AdsUpdate, db: AsyncSession = Depends(get_db)
+    ads_id: str, data: AdsUpdate,
+    db: AsyncSession = Depends(SQL_ENGINE.connection)
 ):
     data: dict = data.dict(exclude_unset=True, exclude_defaults=True)
     return await AdsCrud(

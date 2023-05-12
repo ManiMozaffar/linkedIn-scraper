@@ -12,7 +12,7 @@ import constants
 
 
 async def scrape_linkedin(
-        worker_id: int, info=None,
+        worker_id: int, info=None, recursion_depth=0,
         only_popular=False, headless=False, *args, **kwargs
 ):
     """
@@ -119,11 +119,10 @@ async def scrape_linkedin(
 
         return
     except helpers.PlayWrightTimeOutError:
-        pass
+        if recursion_depth < 5:
+            return await scrape_linkedin(
+                worker_id=worker_id, only_popular=only_popular,
+                headless=headless, recursion_depth=recursion_depth+1
+            )
     except Exception as e:
         loguru.logger.error(e)
-    finally:
-        return await scrape_linkedin(
-            worker_id=worker_id, only_popular=only_popular,
-            headless=headless
-        )

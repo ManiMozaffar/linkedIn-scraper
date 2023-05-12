@@ -9,10 +9,10 @@ from pydantic import BaseModel, HttpUrl, Field
 from fastapi import HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Column, DateTime
+from fastapi_integration.orm.models import AbstractModel
 
 
-from orm.models import AbstractModel
-from db import get_db
+from db import SQL_ENGINE
 from . import utils
 
 
@@ -119,7 +119,7 @@ class CRUD(BaseCRUD, ConstructorMixin):
         return deleted_rows
 
     async def read_all(
-            self,  db_session: AsyncSession = Depends(get_db()),
+            self,  db_session: AsyncSession = Depends(SQL_ENGINE.connection),
             joins=set(),
             order_by: Optional[str] = None,
             skip: int = None,
@@ -155,7 +155,7 @@ class CRUD(BaseCRUD, ConstructorMixin):
 
     async def paginated_read_all(
             self,
-            db_session: AsyncSession = Depends(get_db()),
+            db_session: AsyncSession = Depends(SQL_ENGINE.connection),
             joins=set(), order_by: Optional[str] = None,
             base_url=None, query_params: dict() = dict(),
             **kwargs
@@ -195,7 +195,7 @@ class CRUD(BaseCRUD, ConstructorMixin):
 
     async def read_single(
         self,
-        db_session: AsyncSession = Depends(get_db()),
+        db_session: AsyncSession = Depends(SQL_ENGINE.connection),
         joins=set(),
         **kwargs
     ):
