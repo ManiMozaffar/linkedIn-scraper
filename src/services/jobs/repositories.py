@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from .models import Job
-from db import get_db
+from db import SQL_ENGINE
 from .schemas import (
     JobCreate, JobUpdate, JobOut, JobQuery, CustomPaginationQuery
 )
@@ -19,7 +19,7 @@ router = APIRouter()
 @router.post("", response_model=JobOut)
 async def create_job(
     data: JobCreate,
-    db: AsyncSession = Depends(get_db),
+    db: AsyncSession = Depends(SQL_ENGINE.connection),
 ):
     data: dict = data.dict()
     return await JobCrud(
@@ -31,7 +31,7 @@ async def create_job(
 async def get_jobs(
         request: Request,
         data: JobQuery = Depends(),
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(SQL_ENGINE.connection),
         paginated_data: CustomPaginationQuery = Depends(),
         order_by: Optional[str] = None
 ):
@@ -54,7 +54,9 @@ async def get_jobs(
 
 
 @router.get("/{job_id}", response_model=JobOut)
-async def get_job(job_id: int, db: AsyncSession = Depends(get_db)):
+async def get_job(
+    job_id: int, db: AsyncSession = Depends(SQL_ENGINE.connection)
+):
     return await JobCrud(
         Job, JobCreate, JobUpdate, JobCrud.verbose_name
     ).read_single(
@@ -64,7 +66,8 @@ async def get_job(job_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.put("/{job_id}", response_model=JobOut)
 async def update_job(
-    job_id: int, data: JobUpdate, db: AsyncSession = Depends(get_db)
+    job_id: int, data: JobUpdate,
+    db: AsyncSession = Depends(SQL_ENGINE.connection)
 ):
     data: dict = data.dict(exclude_unset=True, exclude_defaults=True)
     return await JobCrud(

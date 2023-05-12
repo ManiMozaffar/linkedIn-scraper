@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.common import PaginationQuery
 from .models import Proxy
-from db import get_db
+from db import SQL_ENGINE
 from .schemas import ProxyCreate, ProxyUpdate, ProxyOut, ProxyQuery
 from .factory import ProxyCrud
 
@@ -15,7 +15,9 @@ router = APIRouter()
 
 
 @router.post("", response_model=ProxyOut)
-async def create_Proxy(data: ProxyCreate, db: AsyncSession = Depends(get_db)):
+async def create_Proxy(
+    data: ProxyCreate, db: AsyncSession = Depends(SQL_ENGINE.connection)
+):
     data: dict = data.dict()
     return await ProxyCrud(
         Proxy, ProxyCreate, ProxyUpdate, ProxyCrud.verbose_name
@@ -26,7 +28,7 @@ async def create_Proxy(data: ProxyCreate, db: AsyncSession = Depends(get_db)):
 async def get_Proxys(
         request: Request,
         data: ProxyQuery = Depends(),
-        db: AsyncSession = Depends(get_db),
+        db: AsyncSession = Depends(SQL_ENGINE.connection),
         paginated_data: PaginationQuery = Depends(),
         order_by: Optional[str] = None
 ):
@@ -49,7 +51,9 @@ async def get_Proxys(
 
 
 @router.get("/{proxy_id}", response_model=ProxyOut)
-async def get_Proxy(proxy_id: int, db: AsyncSession = Depends(get_db)):
+async def get_Proxy(
+    proxy_id: int, db: AsyncSession = Depends(SQL_ENGINE.connection)
+):
     return await ProxyCrud(
         Proxy, ProxyCreate, ProxyUpdate, ProxyCrud.verbose_name
     ).read_single(
@@ -59,7 +63,8 @@ async def get_Proxy(proxy_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.put("/{proxy_id}", response_model=ProxyOut)
 async def update_Proxy(
-    proxy_id: int, data: ProxyUpdate, db: AsyncSession = Depends(get_db)
+    proxy_id: int, data: ProxyUpdate,
+    db: AsyncSession = Depends(SQL_ENGINE.connection)
 ):
     data: dict = data.dict(exclude_unset=True, exclude_defaults=True)
     return await ProxyCrud(
