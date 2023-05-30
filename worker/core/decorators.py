@@ -1,34 +1,38 @@
-from functools import wraps
-import traceback
-import random
-from typing import Callable, Any
 import asyncio
 import threading
+import random
+from typing import Callable, Any
+from functools import wraps
 
 import loguru
 
 
-def exception_handler(func: Callable):
-    """
-    Decorator that handles exceptions and returns an empty string on failure.
+class add_task:
+    def __init__(self, level=0):
+        self.level = level
 
-    Args:
-        func (function): The function to be decorated.
+    def __call__(self, func):
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
 
-    Returns:
-        function: The decorated function.
-    """
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            loguru.logger.error(
-                f"Error raised at {func.__name__} with {args} & {kwargs}: {e}"
-            )
-            traceback.print_exc()
-            return ""
-    return wrapper
+        wrapper._task_info = {
+            'level': self.level,
+            'func': func,
+        }
+        return wrapper
+
+
+def async_timeout(timeout: float):
+    def decorator(func: Callable) -> Callable:
+        async def wrapper(*args: Any, **kwargs: Any) -> Any:
+            try:
+                return await asyncio.wait_for(func(*args, **kwargs), timeout)
+            except asyncio.TimeoutError:
+                raise TimeoutError(
+                    f"Function '{func.__name__}' exceeded {timeout} seconds."
+                )
+        return wrapper
+    return decorator
 
 
 def get_unique_object(func: Callable):
@@ -71,16 +75,3 @@ def get_unique_object(func: Callable):
                 return wrapper(*args, **kwargs)
 
     return wrapper
-
-
-def async_timeout(timeout: float):
-    def decorator(func: Callable) -> Callable:
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
-            try:
-                return await asyncio.wait_for(func(*args, **kwargs), timeout)
-            except asyncio.TimeoutError:
-                raise TimeoutError(
-                    f"Function '{func.__name__}' exceeded {timeout} seconds."
-                )
-        return wrapper
-    return decorator

@@ -55,3 +55,8 @@ COUNTRIES = [
 ]
 
 POPULAR_DESTINATION = ["Sweden", "Germany", "Netherlands"]
+
+IGNORE_LIST = [
+    "how can i assist you today",
+    "thebai"
+]

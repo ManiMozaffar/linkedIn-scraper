@@ -1,15 +1,16 @@
 import logging
 
 import uvicorn
-from fastapi_integration import FastAPIExtended, FastApiConfig
+from fastapi_integration import FastAPIExtended
 
 from core.routes import router
+from core.config import get_app_settings
 from db import Base, SQL_ENGINE
 
 
 app = FastAPIExtended(
     features=[
-        FastApiConfig,
+        get_app_settings(),
     ],
     db_engine=SQL_ENGINE,
     routers=[
