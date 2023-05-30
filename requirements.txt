@@ -53,4 +53,4 @@ win32-setctime==1.1.0
 wincertstore==0.2
 alembic==1.10.2
 aiohttp
-fastapi-integration==0.1.1
+fastapi-integration==0.1.2
