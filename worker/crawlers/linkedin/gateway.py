@@ -1,10 +1,10 @@
 import json
 from typing import Union, List
-import logging
 import asyncio
 
 from playwright.async_api import Page, Response, TimeoutError
 import httpx
+from loguru import logger
 
 
 from crawlers.linkedin import xpaths, prompt
@@ -95,8 +95,15 @@ class AdsDataGateway(PlayWrightCrawler):
             )
             if text:
                 self.data.body = text
+            else:
+                self.data = None  # Data's body failed validation
+
             if hashtags:
                 self.data.keywords = hashtags
+            return None
+
+        self.data = None  # Data failed validation
+        return None
 
     @async_timeout(120)
     async def get_response_from_theb_ai(self, chatgpt_page: Page) -> dict:
@@ -110,7 +117,7 @@ class AdsDataGateway(PlayWrightCrawler):
             lines = list(filter(None, result.split('\n')))
             return json.loads(lines[-1])
         except TimeoutError:
-            logging.error("Timeout exceed in get_response_from_theb_ai")
+            logger.error("Timeout exceed in get_response_from_theb_ai")
 
 
 class AdsURLGateway(PlayWrightCrawler):

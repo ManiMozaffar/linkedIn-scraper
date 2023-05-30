@@ -1,8 +1,8 @@
-import requests
+import aiohttp
 import asyncio
 from typing import List
 import json
-import logging
+from loguru import logger
 
 from core.enums import HttpMethod
 from crawlers.linkedin.gateway import AdsDataGateway, AdsURLGateway
@@ -63,23 +63,30 @@ class LinkedinRepository(BaseRepository):
         ]
 
     async def save_data_to_url(
-        self, data: LinkedinData, endpoint: str, method: HttpMethod
+        self, session: aiohttp.ClientSession,
+        data: LinkedinData, endpoint: str, method: HttpMethod
     ) -> dict:
-        response = requests.request(
-            method=method.value.upper(),
-            url=self.base_url + endpoint,
-            json=json.loads(data.json())
-        )
-        if response.status_code == 200:
-            logging.info("Saved data to URL")
-        return response
+        try:
+            async with session.request(
+                method=method.value.upper(),
+                url=self.base_url + endpoint,
+                json=json.loads(data.json())
+            ) as response:
+                if response.status == 200:
+                    logger.info("Saved data to URL")
+                return await response.json()
+        except Exception as error:
+            logger.error(f"Error saving data to URL: {error}")
 
     async def save_all_data(
         self, all_data: List[LinkedinData], endpoint: str, method: HttpMethod
     ):
-        await asyncio.gather(
-            *[
-                self.save_data_to_url(data, endpoint, method)
-                for data in all_data
-            ]
-        )
+        async with aiohttp.ClientSession() as session:
+            await asyncio.gather(
+                *[
+                    asyncio.ensure_future(
+                        self.save_data_to_url(session, data, endpoint, method)
+                    )
+                    for data in all_data
+                ]
+            )

@@ -1,4 +1,8 @@
 from itertools import product
+import random
+import asyncio
+
+from loguru import logger
 
 
 from crawlers.linkedin.repository import LinkedinRepository
@@ -29,14 +33,19 @@ class LinkedinController:
             )
             for job in job_urls
         ]
+        random.shuffle(self.job_models)
 
     async def process(self):
         for index in range(0, len(self.job_models), self.batch_size):
             batch = self.job_models[index:index+self.batch_size]
+            logger.success(f"Processing {len(batch)} batches")
             ads_urls = await self.repository.get_urls(batch)
+            logger.success(f"Fetched {len(ads_urls)} links")
             all_ads = await self.repository.process_advertisements(ads_urls)
+            logger.success(f"Processed {len(ads_urls)} results")
             await self.repository.save_all_data(
                 all_data=all_ads,
                 endpoint="/api/ads/",
                 method=HttpMethod.POST,
             )
+            await asyncio.sleep(6)  # 6 second cooldown between each batch
