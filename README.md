@@ -14,7 +14,7 @@
 
 ## Proxycurl LinkedIn APIs
 
-[![Proxycurl APIs enrich people and company profiles with structured data]()](https://nubela.co/proxycurl?utm_campaign=influencer_marketing&utm_source=github&utm_medium=social&utm_content=-mani_mozaffar)
+[![Proxycurl APIs enrich people and company profiles with structured data](https://raw.githubusercontent.com/josephlimtech/linkedIn-scraper/main/Proxycurl%20Logo.png)](https://nubela.co/proxycurl?utm_campaign=influencer_marketing&utm_source=github&utm_medium=social&utm_content=-mani_mozaffar)
 
 Scrape public LinkedIn profile data at scale with [Proxycurl APIs](https://nubela.co/proxycurl?utm_campaign=influencer_marketing&utm_source=github&utm_medium=social&utm_content=-mani_mozaffar).
 
